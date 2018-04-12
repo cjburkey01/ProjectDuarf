@@ -123,6 +123,7 @@ GameObject:
   - component: {fileID: 1015428802}
   - component: {fileID: 1015428804}
   - component: {fileID: 1015428803}
+  - component: {fileID: 1015428805}
   - component: {fileID: 1015428801}
   m_Layer: 0
   m_Name: Player
@@ -199,6 +200,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0803c9c4b0e948c7a189de81d6f1d20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skinWidth: 0.01
+  raysForBottom: 5
+  raysForTop: 3
+  raysForRight: 5
+  raysForLeft: 5
 --- !u!61 &1015428804
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -224,6 +230,17 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1015428805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1015428800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 678b800fce59f4604aa57f3eb87018dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2112239446
 GameObject:
   m_ObjectHideFlags: 0
