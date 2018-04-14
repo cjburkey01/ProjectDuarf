@@ -4,10 +4,14 @@ public class CameraFollow : MonoBehaviour {
 	
 	public Transform follow;
 	public float smoothing = 0.1f;
-	public int z = -10;
 
 	private Vector3 vel;
 	private Vector3 current;
+	private float z = -10;
+
+	void Start() {
+		z = transform.position.z;
+	}
 
 	void Update() {
 		current = transform.position;
