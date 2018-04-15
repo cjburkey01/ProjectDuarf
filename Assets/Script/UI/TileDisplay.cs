@@ -28,7 +28,7 @@ public class TileDisplay : MonoBehaviour {
 	
 	public void OnClick() {
 		if (tile != null) {
-			PickerUI.INSTANCE.Toggle();
+			GUIHandler.HideGui();
 			LevelEditorHandler.INSTANCE.SetSelectedTile(tile);
 		}
 	}

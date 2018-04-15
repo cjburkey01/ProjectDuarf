@@ -27,7 +27,7 @@ public class CameraMove : MonoBehaviour {
 	}
 
 	void Update() {
-		if (!PickerUI.INSTANCE.Enabled) {
+		if (!GUIHandler.IsShown()) {
 			goalPos.x += Input.GetAxisRaw("Horizontal") * Time.deltaTime * moveSpeed;
 			goalPos.y += Input.GetAxisRaw("Vertical") * Time.deltaTime * moveSpeed;
 

@@ -33,6 +33,9 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void Update() {
+		if (GameHandler.IsPaused) {
+			return;
+		}
 		if (controller.IsCollidingDown || controller.IsCollidingUp) {
 			velocity.y = 0.0f;
 		}
@@ -54,7 +57,7 @@ public class PlayerMovement : MonoBehaviour {
 		time += Time.deltaTime;
 		input.x = Mathf.Lerp(input.x, moveSpeed * Input.GetAxisRaw("Horizontal"), time / moveAccelerationTime);
 		input.y = 0.0f;
-		if (controller.IsCollidingDown && Input.GetAxisRaw("Jump") > 0) {
+		if (controller.IsCollidingDown && Input.GetButtonDown("Jump")) {
 			input.y = jumpVelocity;
 		}
 	}

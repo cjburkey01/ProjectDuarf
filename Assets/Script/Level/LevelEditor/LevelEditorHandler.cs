@@ -10,6 +10,7 @@ public class LevelEditorHandler : MonoBehaviour {
 	public int gridWidth = 3;
 	public Vector2 gridSizeBounds = new Vector2(0.25f, 4.0f);
 	public Vector2 HoverPos { private set; get; }
+	public bool LevelLoaded { private set; get; }
 
 	private bool snapToGrid;
 	private Vector2 lastMouse;
@@ -18,37 +19,79 @@ public class LevelEditorHandler : MonoBehaviour {
 		INSTANCE = this;
 	}
 
+	public bool NewLevel(string name) {
+		if (LevelIO.LevelExists(true, name) || LevelIO.LevelExists(false, name)) {
+			Debug.LogError("Level already exists: " + name);
+			return false;
+		}
+		level = new LevelData(name);
+		SaveLevel();
+		LevelLoaded = true;
+		return true;
+	}
+
+	public void LoadLevel(bool resource, string name) {
+		LevelLoaded = LevelIO.LoadLevel(false, resource, true, transform, level, name);
+		if (!LevelLoaded) {
+			Debug.Log("Could not load level from level editor handler: " + name);
+		}
+	}
+
+	public void SaveLevel() {
+		LevelIO.SaveLevel(level, level.Name);
+	}
+
 	void Start() {
 		TileInitialization.Init();
 		LevelIO.InitIO();
 		movingObject.UpdateGrid(gridWidth, gridSize);
 	}
-	
-	bool first = true;
 
 	void Update() {
-		if (first) {
-			LevelIO.LoadLevelFromFile(transform, level, "LevelTest");
-			first = false;
+		// Generic GUI keys
+		if (Input.GetButtonDown("Cancel")) {
+			if (GUIHandler.IsShown()) {
+				GUIHandler.HideGui();
+			} else {
+				GUIHandler.ShowGui(GuiEditorMenu.INSTANCE);
+			}
 		}
 
-		if (Input.GetKeyDown(KeyCode.E) || (PickerUI.INSTANCE.Enabled && Input.GetButtonDown("Cancel"))) {
-			PickerUI.INSTANCE.Toggle();
-		}
-		if (PickerUI.INSTANCE.Enabled) {
+		// Ignore any other open gui than the picker
+		if (GUIHandler.IsShown() && !GUIHandler.IsShown(GuiEditorPicker.INSTANCE)) {
 			return;
 		}
 
+		// If there is no level open and the dialog to choose a level is not shown, show it
+		if (!LevelLoaded && !GUIHandler.IsShown(GuiEditorMenu.INSTANCE)) {
+			GUIHandler.ShowGui(GuiEditorMenu.INSTANCE);
+		}
+
+		// Picker dialog keys
+		if (Input.GetKeyDown(KeyCode.E)) {
+			if (GUIHandler.IsShown(GuiEditorPicker.INSTANCE)) {
+				GUIHandler.HideGui();
+			} else {
+				GUIHandler.ShowGui(GuiEditorPicker.INSTANCE);
+			}
+		}
+
+		// Editor keys
 		if (Input.GetKeyDown(KeyCode.Q)) {
 			SetSelectedTile(null);
 		}
-
 		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.S)) {
 			Debug.Log("Saving level: " + LevelIO.LevelDir + level.Name + ".lvl");
 			LevelIO.SaveLevel(level, level.Name);
 			return;
 		}
 
+		// If a gui is open, ignore the editor keys and buttons in the background
+		if (GUIHandler.IsShown()) {
+			return;
+		}
+
+		// Building buttons and keys
 		bool left = Input.GetButtonDown("Fire1");
 		bool right = Input.GetButtonDown("Fire2");
 		if (left || right) {
@@ -63,6 +106,7 @@ public class LevelEditorHandler : MonoBehaviour {
 			}
 		}
 
+		// Grid controls
 		snapToGrid = !Input.GetKey(KeyCode.LeftAlt);
 		if (Input.GetKey(KeyCode.LeftShift)) {
 			if (Input.GetKeyDown(KeyCode.Equals)) {
@@ -76,10 +120,12 @@ public class LevelEditorHandler : MonoBehaviour {
 			movingObject.UpdateGrid(gridWidth, gridSize);
 		}
 
+		// If the preview is red, make it green again when the mouse moves (user feedback for error in placing object)
 		if (lastMouse.x != Input.mousePosition.x || lastMouse.y != Input.mousePosition.y) {
 			movingObject.ResetErrorColor();
 		}
 
+		// Mouse grid and object placement preview
 		Vector3 at = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 		lastMouse = Input.mousePosition;
 		at.z = 0.0f;

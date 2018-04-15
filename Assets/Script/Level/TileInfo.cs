@@ -2,6 +2,8 @@
 using UnityEngine;
 
 public static class TileInitialization {
+
+	public static TileInfo tilePlaceholderPlayer;
 	
 	public static TileInfo tileSolidGrassLeft;
 	public static TileInfo tileSolidGrassMiddle;
@@ -23,8 +25,17 @@ public static class TileInitialization {
 	public static TileInfo tilePlatformSandMiddle;
 	public static TileInfo tilePlatformSandRight;
 
+	public static bool HasInit { private set; get; }
+
 	// Creates the types of tiles used in the game
 	public static void Init() {
+		if (HasInit) {
+			return;
+		}
+		HasInit = true;
+
+		tilePlaceholderPlayer = Tiles.RegisterTile(new TilePlaceholder("Prefab/Game/Player", "PlaceholderPlayer", "Tile/Placeholder/Player", true));
+
 		tileSolidGrassLeft = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f), "Tile/Solid/SolidGrassLeft", true));
 		tileSolidGrassMiddle = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f), "Tile/Solid/SolidGrassMiddle", true));
 		tileSolidGrassRight = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f), "Tile/Solid/SolidGrassRight", true));
@@ -35,15 +46,15 @@ public static class TileInitialization {
 		tileSolidDirt = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f), "Tile/Solid/SolidDirt", true));
 		tileSolidDirtCenter = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f), "Tile/Solid/SolidDirtCenter", true));
 
-		tilePlatformGrass = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.21f), new Vector2(1.0f, 0.57f), "Tile/Platform/PlatformGrass"));
-		tilePlatformGrassLeft = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.21f), new Vector2(1.0f, 0.57f), "Tile/Platform/PlatformGrassLeft"));
-		tilePlatformGrassMiddle = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.21f), new Vector2(1.0f, 0.57f), "Tile/Platform/PlatformGrassMiddle"));
-		tilePlatformGrassRight = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.21f), new Vector2(1.0f, 0.57f), "Tile/Platform/PlatformGrassRight"));
+		tilePlatformGrass = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.49f), new Vector2(1.0f, 0.01f), "Tile/Platform/PlatformGrass"));
+		tilePlatformGrassLeft = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.49f), new Vector2(1.0f, 0.01f), "Tile/Platform/PlatformGrassLeft"));
+		tilePlatformGrassMiddle = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.49f), new Vector2(1.0f, 0.01f), "Tile/Platform/PlatformGrassMiddle"));
+		tilePlatformGrassRight = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.49f), new Vector2(1.0f, 0.01f), "Tile/Platform/PlatformGrassRight"));
 
-		tilePlatformSand = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.21f), new Vector2(1.0f, 0.57f), "Tile/Platform/PlatformSand"));
-		tilePlatformSandLeft = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.21f), new Vector2(1.0f, 0.57f), "Tile/Platform/PlatformSandLeft"));
-		tilePlatformSandMiddle = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.21f), new Vector2(1.0f, 0.57f), "Tile/Platform/PlatformSandMiddle"));
-		tilePlatformSandRight = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.21f), new Vector2(1.0f, 0.57f), "Tile/Platform/PlatformSandRight"));
+		tilePlatformSand = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.49f), new Vector2(1.0f, 0.01f), "Tile/Platform/PlatformSand"));
+		tilePlatformSandLeft = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.49f), new Vector2(1.0f, 0.01f), "Tile/Platform/PlatformSandLeft"));
+		tilePlatformSandMiddle = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.49f), new Vector2(1.0f, 0.01f), "Tile/Platform/PlatformSandMiddle"));
+		tilePlatformSandRight = Tiles.RegisterTile(new TileBasic(new Vector2(0.0f, 0.49f), new Vector2(1.0f, 0.01f), "Tile/Platform/PlatformSandRight"));
 
 		Debug.Log("Loaded game tiles: " + Tiles.GetTiles().Length);
 	}
@@ -83,13 +94,12 @@ public abstract class TileInfo {
 	public abstract string GetResourceName();
 	public abstract string GetIconResourceName();
 
-	public virtual bool HasCustomInstantiation() {
+	/// <summary>
+	///		Returns false if the default initialization is to be done
+	/// </summary>
+	public virtual bool DoCustomInstantiation(bool init, Vector2 pos, float z, out GameObject obj) {
+		obj = null;
 		return false;
-	}
-
-	public virtual GameObject DoCustomInstantiation(Vector2 pos, float z) {
-		Debug.LogError("Failed to instantiate custom object: the instantiation method was not overriden");
-		return new GameObject("FailedToInstantiate");
 	}
 
 	public virtual void OnDestroy(TileData self) {
@@ -149,12 +159,8 @@ public class TileBasic : TileInfo {
 		return iconPath;
 	}
 
-	public override bool HasCustomInstantiation() {
-		return true;
-	}
-
-	public override GameObject DoCustomInstantiation(Vector2 pos, float z) {
-		GameObject obj = new GameObject("Tile " + iconPath);
+	public override bool DoCustomInstantiation(bool init, Vector2 pos, float z, out GameObject obj) {
+		obj = new GameObject("Tile " + iconPath);
 		SpriteRenderer spren = obj.AddComponent<SpriteRenderer>();
 		BoxCollider2D coll = obj.AddComponent<BoxCollider2D>();
 		coll.offset = colliderOffset;
@@ -165,7 +171,67 @@ public class TileBasic : TileInfo {
 		}
 		obj.transform.position = new Vector3(pos.x, pos.y, z);
 		obj.layer = LayerMask.NameToLayer((solid) ? "Solid" : "Platform");
-		return obj;
+		return true;
+	}
+
+}
+
+public class TilePlaceholder : TileInfo {
+	
+	private readonly string prefabPath;
+	private readonly string name;
+	private readonly string iconPath;
+	private readonly bool limitOne;
+	private readonly System.Guid uuid;
+
+	public TilePlaceholder(string prefabPath, string name, string iconPath, bool limitOne) {
+		this.prefabPath = prefabPath;
+		this.name = name;
+		this.iconPath = iconPath;
+		this.limitOne = limitOne;
+		if (limitOne) {
+			uuid = System.Guid.NewGuid();
+		}
+	}
+
+	public override string GetResourceName() {
+		return name;
+	}
+
+	public override string GetIconResourceName() {
+		return iconPath;
+	}
+
+	public override bool DoCustomInstantiation(bool init, Vector2 pos, float z, out GameObject obj) {
+		obj = null;
+		if (!init) {
+			obj = new GameObject("Placeholder " + name);
+			SpriteRenderer spren = obj.AddComponent<SpriteRenderer>();
+			BoxCollider2D coll = obj.AddComponent<BoxCollider2D>();
+			coll.offset = new Vector2(0.0f, 0.0f);
+			coll.size = new Vector2(1.0f, 1.0f);
+			spren.sprite = Resources.Load<Sprite>(iconPath);
+			if (spren.sprite == null) {
+				Debug.LogError("Sprite not found: " + iconPath);
+			}
+			obj.transform.position = new Vector3(pos.x, pos.y, z);
+			obj.layer = LayerMask.NameToLayer("Solid");
+			return true;
+		}
+		GameObject at = Resources.Load<GameObject>(prefabPath);
+		if (at == null) {
+			Debug.LogError("Failed to load prefab: " + at);
+			return true;
+		}
+		if (limitOne && GameObject.Find(uuid.ToString()) != null) {
+			Debug.LogWarning("Multiple objects almost instantiated of a single-only placeholder: " + name);
+			return true;
+		}
+		obj = Object.Instantiate(at, new Vector3(pos.x, pos.y, z), Quaternion.identity);
+		if (limitOne) {
+			obj.name = uuid.ToString();
+		}
+		return true;
 	}
 
 }

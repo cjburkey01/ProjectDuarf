@@ -1,32 +1,21 @@
 ﻿using UnityEngine;
 
-public class PickerUI : MonoBehaviour {
-	
-	public static PickerUI INSTANCE { private set; get; }
+public class GuiEditorPicker : GameGUI {
 
-	public GameObject pickerUi;
+	public static GuiEditorPicker INSTANCE { private set; get; }
+
 	public GameObject container;
 	public GameObject prefabDisplay;
-	public bool Enabled { private set; get; }
 
-	public PickerUI() {
+	public GuiEditorPicker() {
 		INSTANCE = this;
-
-		// Reset
-		Enabled = false;
 	}
 
-	public void Toggle() {
-		Enabled = !Enabled;
-		if (Enabled) {
-			Enable();
-		} else {
-			Clear();
-		}
-		pickerUi.SetActive(Enabled);
+	public override string GetUniqueName() {
+		return "GuiEditorPicker";
 	}
 
-	public void Enable() {
+	public override void OnShow(GameGUI previousGui) {
 		foreach (TileInfo tile in Tiles.GetTiles()) {
 			GameObject obj = Instantiate(prefabDisplay, container.transform, false);
 			obj.name = "Tile " + tile.GetResourceName();
@@ -35,7 +24,7 @@ public class PickerUI : MonoBehaviour {
 		}
 	}
 
-	public void Clear() {
+	public override void OnHide(GameGUI nextGui) {
 		foreach (Transform tile in container.transform) {
 			Destroy(tile.gameObject);
 		}

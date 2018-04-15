@@ -13,7 +13,13 @@ public class LevelData {
 		Name = name;
 	}
 
-	public bool AddTile(bool initialize, Transform parent, Vector2 position, float z, TileInfo tile) {
+	public bool AddTile(bool init, Transform parent, Vector2 position, float z, TileInfo tile) {
+		TileData n;
+		return AddTile(init, parent, position, z, tile, out n);
+	}
+
+	public bool AddTile(bool init, Transform parent, Vector2 position, float z, TileInfo tile, out TileData tDone) {
+		tDone = null;
 		TileData at = GetTileAt(position);
 		if (at != null) {
 			if (at.Tile.Equals(tile)) {
@@ -22,24 +28,37 @@ public class LevelData {
 			z = at.Z - 0.1f;
 		}
 		TileData tileD = new TileData(position, z, tile);
-		if (InstantiateTile(parent, tileD, initialize) != null) {
+		if (InstantiateTile(init, parent, tileD) != null) {
 			tiles.Add(tileD);
+			tDone = tileD;
 			return true;
 		}
 		return false;
 	}
 
-	public bool AddTile(bool initialize, Transform parent, TileData tile) {
-		if (InstantiateTile(parent, tile, initialize) != null) {
+	public bool AddTile(bool init, Transform parent, TileData tile) {
+		if (InstantiateTile(init, parent, tile) != null) {
 			tiles.Add(tile);
 			return true;
 		}
 		return false;
 	}
 
+	public void OnInit() {
+		foreach (TileData tile in tiles) {
+			tile.Tile.OnCreate(tile);
+		}
+	}
+
 	public void OnUpdate() {
 		foreach (TileData tile in tiles) {
 			tile.Tile.OnUpdate(tile);
+		}
+	}
+
+	public void OnDestroy() {
+		foreach (TileData tile in tiles) {
+			tile.Tile.OnDestroy(tile);
 		}
 	}
 
@@ -73,8 +92,15 @@ public class LevelData {
 		return data;
 	}
 
-	public void Deserialize(Transform parent, string serialized) {
+	public void Deserialize(bool init, bool fullColliders, Transform parent, string serialized) {
 		tiles.Clear();
+		foreach (Transform t in parent) {
+			Object.Destroy(t.gameObject);
+			t.name = "**__==DESTROYED==__**";
+			if (t.GetComponent<PlayerController>() != null) {
+				t.GetComponent<PlayerController>().DoDestroy();
+			}
+		}
 		string[] spl = serialized.Split(new char[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
 		bool loadingName = true;
 		Debug.Log("Loading tiles: " + (spl.Length - 1));
@@ -86,8 +112,16 @@ public class LevelData {
 			}
 			TileData t = TileData.Deserialize(tile);
 			if (t != null) {
-				if (!AddTile(true, parent, t)) {
+				if (!AddTile(init, parent, t)) {
 					Debug.LogError("Failed to add tile: " + tile);
+				}
+				if (fullColliders) {
+					BoxCollider2D c = t.Instantiated.GetComponent<BoxCollider2D>();
+					if (c == null) {
+						c = t.Instantiated.AddComponent<BoxCollider2D>();
+					}
+					c.offset = new Vector2(0.0f, 0.0f);
+					c.size = new Vector2(1.0f, 1.0f);
 				}
 			} else {
 				Debug.LogError("Failed to deserialize tile: " + tile);
@@ -96,14 +130,9 @@ public class LevelData {
 		Debug.Log("Loaded " + tiles.Count + " tiles");
 	}
 
-	public static GameObject InstantiateTile(Transform parent, TileData data) {
-		return InstantiateTile(parent, data, true);
-	}
-
-	public static GameObject InstantiateTile(Transform parent, TileData data, bool initialize) {
+	public static GameObject InstantiateTile(bool init, Transform parent, TileData data) {
 		GameObject instance = null;
-		if (data.Tile.HasCustomInstantiation()) {
-			instance = data.Tile.DoCustomInstantiation(data.Position, data.Z);
+		if (data.Tile.DoCustomInstantiation(init, data.Position, data.Z, out instance)) {
 			if (ReferenceEquals(instance, null)) {
 				Debug.LogError("Unable to instantiate tile: " + data.Tile.GetResourceName() + ", the custom instantiation returned null");
 				return null;
@@ -119,9 +148,6 @@ public class LevelData {
 			instance = Object.Instantiate(prefab, new Vector3(data.Position.x, data.Position.y, data.Z), Quaternion.identity, parent);
 			instance.name = data.Tile.GetResourceName() + " (" + data.Position.x + ", " + data.Position.y + ")";
 			data.SetInstantiated(instance);
-		}
-		if (initialize) {
-			data.Tile.OnCreate(data);
 		}
 		return instance;
 	}
@@ -151,7 +177,6 @@ public class TileData {
 	}
 
 	public void Destroy() {
-		Tile.OnDestroy(this);
 		if (!ReferenceEquals(Instantiated, null)) {
 			Object.Destroy(Instantiated);
 		}

@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour {
 	public bool IsCollidingLeft { private set; get; }
 	public bool IsCollidingRight { private set; get; }
 	public bool IsClimbing { private set; get; }
+	public bool Destroyed { private set; get; }
 	public float SlopeAngle { private set; get; }
 	public float SlopeAnglePrev { private set; get; }
 
@@ -65,6 +66,9 @@ public class PlayerController : MonoBehaviour {
 				rayLength = velocity.x;
 			}
 			rayLength = Mathf.Max(rayLength, 0.0f) + skinWidth;
+			if (rayLength <= skinWidth) {
+				continue;
+			}
 
 			Vector2 s = ray.start + new Vector2(transform.position.x, transform.position.y);
 			Debug.DrawLine(s + velocity, s + velocity + rayLength * ray.direction, Color.red);	// Velocity render
@@ -119,6 +123,10 @@ public class PlayerController : MonoBehaviour {
 
 		transform.position += new Vector3(velocity.x, velocity.y, 0.0f);
 		velocity = Vector2.zero;	// Velocity is handled by the player movement motor, not the character controller
+	}
+
+	public void DoDestroy() {
+		Destroyed = true;
 	}
 
 	private void ClimbSlope(float angle) {
