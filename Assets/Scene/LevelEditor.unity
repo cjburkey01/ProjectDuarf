@@ -195,7 +195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.2352941, g: 0.2352941, b: 0.2352941, a: 0}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -340,6 +340,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridPrefab: {fileID: 21300000, guid: 3dc1c0a93851941429794887dfe82ef7, type: 3}
   opacity: 0.25
+  previewColor: {r: 0.6, g: 1, b: 0.6, a: 0.5}
+  errorColor: {r: 1, g: 0.6, b: 0.6, a: 0.5}
   size: 0
 --- !u!1 &662188519
 GameObject:
@@ -553,7 +555,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.65882355, g: 0.49019608, b: 0.67058825, a: 0.9098039}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -649,7 +651,7 @@ MonoBehaviour:
   movingObject: {fileID: 301696075}
   gridSize: 1
   gridWidth: 7
-  gridSizeBounds: {x: 0.25, y: 4}
+  gridSizeBounds: {x: 0.5, y: 2}
 --- !u!114 &1566082241
 MonoBehaviour:
   m_ObjectHideFlags: 0

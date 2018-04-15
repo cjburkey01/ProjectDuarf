@@ -78,7 +78,7 @@ public class GridDisplay : MonoBehaviour {
 		if (tile == null) {
 			return;
 		}
-		selected = LevelData.InstantiateTile(transform, new TileData(Vector2.zero, 0.0f, tile));
+		selected = LevelData.InstantiateTile(transform, new TileData(Vector2.zero, 0.0f, tile), false);
 		if (selected == null) {
 			return;
 		}
@@ -96,7 +96,7 @@ public class GridDisplay : MonoBehaviour {
 
 	public void Place(Vector2 pos, LevelData data, LevelEditorHandler leh) {
 		if (tile != null) {
-			if (!data.AddTile(leh.transform, pos, transform.position.z, tile)) {
+			if (!data.AddTile(false, leh.transform, pos, transform.position.z, tile)) {
 				MarkErrorColor();
 			}
 		}

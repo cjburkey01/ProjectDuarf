@@ -5,14 +5,21 @@
 public class PlayerMovement : MonoBehaviour {
 	
 	public float jumpHeight = 2.5f;
-	public float jumpHalfTime = 0.25f;
-	public float moveSpeed = 3.0f;
+	public float jumpHalfTime = 0.35f;
+	public float moveSpeed = 6.0f;
+	public float moveAccelerationTime = 0.1f;
 	
 	private Vector2 input;
 	private Vector2 velocity;
 	private PlayerController controller;
 	private float plyGravity;
 	private float jumpVelocity;
+
+	private bool left;
+	private bool right;
+	private bool pleft;
+	private bool pright;
+	private float time;
 
 	void Start() {
 		controller = GetComponent<PlayerController>();
@@ -29,7 +36,6 @@ public class PlayerMovement : MonoBehaviour {
 		if (controller.IsCollidingDown || controller.IsCollidingUp) {
 			velocity.y = 0.0f;
 		}
-		input = new Vector2();
 		DoMovement();
 		velocity.x = input.x;
 		velocity.y += input.y;
@@ -38,7 +44,16 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	private void DoMovement() {
-		input.x = moveSpeed * Input.GetAxisRaw("Horizontal");
+		left = Mathf.Approximately(Input.GetAxisRaw("Horizontal"), -1.0f);
+		right = Mathf.Approximately(Input.GetAxisRaw("Horizontal"), 1.0f);
+		if (left != pleft || right != pright) {
+			time = 0.0f;
+		}
+		pleft = left;
+		pright = right;
+		time += Time.deltaTime;
+		input.x = Mathf.Lerp(input.x, moveSpeed * Input.GetAxisRaw("Horizontal"), time / moveAccelerationTime);
+		input.y = 0.0f;
 		if (controller.IsCollidingDown && Input.GetAxisRaw("Jump") > 0) {
 			input.y = jumpVelocity;
 		}

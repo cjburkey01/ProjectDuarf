@@ -27,7 +27,6 @@ public class PickerUI : MonoBehaviour {
 	}
 
 	public void Enable() {
-		TileInitialization.i ++;
 		foreach (TileInfo tile in Tiles.GetTiles()) {
 			GameObject obj = Instantiate(prefabDisplay, container.transform, false);
 			obj.name = "Tile " + tile.GetResourceName();

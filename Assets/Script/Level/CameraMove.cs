@@ -27,11 +27,13 @@ public class CameraMove : MonoBehaviour {
 	}
 
 	void Update() {
-		goalPos.x += Input.GetAxisRaw("Horizontal") * Time.deltaTime * moveSpeed;
-		goalPos.y += Input.GetAxisRaw("Vertical") * Time.deltaTime * moveSpeed;
+		if (!PickerUI.INSTANCE.Enabled) {
+			goalPos.x += Input.GetAxisRaw("Horizontal") * Time.deltaTime * moveSpeed;
+			goalPos.y += Input.GetAxisRaw("Vertical") * Time.deltaTime * moveSpeed;
 
-		zoomGoal -= Input.GetAxisRaw("Mouse ScrollWheel") * Time.deltaTime * Mathf.Pow(zoomSpeed, zoomRatio);
-		zoomGoal = Mathf.Clamp(zoomGoal, zoomBounds.x, zoomBounds.y);
+			zoomGoal -= Input.GetAxisRaw("Mouse ScrollWheel") * Time.deltaTime * Mathf.Pow(zoomSpeed, zoomRatio);
+			zoomGoal = Mathf.Clamp(zoomGoal, zoomBounds.x, zoomBounds.y);
+		}
 
 		cam.orthographicSize = Mathf.SmoothDamp(cam.orthographicSize, zoomGoal, ref zoomVel, smoothing);
 		transform.position = Vector3.SmoothDamp(transform.position, new Vector3(goalPos.x, goalPos.y, z), ref velPos, smoothing);

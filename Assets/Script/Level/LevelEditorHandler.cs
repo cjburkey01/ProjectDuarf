@@ -5,7 +5,7 @@ public class LevelEditorHandler : MonoBehaviour {
 	public static LevelEditorHandler INSTANCE { private set; get; }
 
 	public GridDisplay movingObject;
-	public LevelData level = new LevelData();
+	public LevelData level = new LevelData("LevelTest");
 	public float gridSize = 1.0f;
 	public int gridWidth = 3;
 	public Vector2 gridSizeBounds = new Vector2(0.25f, 4.0f);
@@ -19,10 +19,19 @@ public class LevelEditorHandler : MonoBehaviour {
 	}
 
 	void Start() {
+		TileInitialization.Init();
+		LevelIO.InitIO();
 		movingObject.UpdateGrid(gridWidth, gridSize);
 	}
 	
+	bool first = true;
+
 	void Update() {
+		if (first) {
+			LevelIO.LoadLevelFromFile(transform, level, "LevelTest");
+			first = false;
+		}
+
 		if (Input.GetKeyDown(KeyCode.E) || (PickerUI.INSTANCE.Enabled && Input.GetButtonDown("Cancel"))) {
 			PickerUI.INSTANCE.Toggle();
 		}
@@ -32,6 +41,12 @@ public class LevelEditorHandler : MonoBehaviour {
 
 		if (Input.GetKeyDown(KeyCode.Q)) {
 			SetSelectedTile(null);
+		}
+
+		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.S)) {
+			Debug.Log("Saving level: " + LevelIO.LevelDir + level.Name + ".lvl");
+			LevelIO.SaveLevel(level, level.Name);
+			return;
 		}
 
 		bool left = Input.GetButtonDown("Fire1");
