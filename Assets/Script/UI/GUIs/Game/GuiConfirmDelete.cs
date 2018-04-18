@@ -23,7 +23,8 @@ public class GuiConfirmDelete : GameGUI {
 	}
 
 	public override void OnShow(GameGUI previousGui) {
-		if (levelName == null || !LevelIO.LevelExists(false, levelName)) {
+		if (levelName == null || !LevelIO.GetLevelExists(levelName)) {
+			Debug.Log("Level: " + levelName + " does not exist");
 			StartCoroutine(Remove());
 			return;
 		}
@@ -50,7 +51,11 @@ public class GuiConfirmDelete : GameGUI {
 	}
 
 	void Close() {
-		GUIHandler.ShowGui(GuiGameLoadLevel.INSTANCE);
+		if (GuiGameLoadLevel.INSTANCE == null) {
+			GUIHandler.ShowGui(GuiEditorLoadLevel.INSTANCE);
+		} else {
+			GUIHandler.ShowGui(GuiGameLoadLevel.INSTANCE);
+		}
 	}
 
 }

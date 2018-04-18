@@ -20,7 +20,7 @@ public class LevelEditorHandler : MonoBehaviour {
 	}
 
 	public bool NewLevel(string name) {
-		if (LevelIO.LevelExists(true, name) || LevelIO.LevelExists(false, name)) {
+		if (LevelIO.GetLevelExists(name)) {
 			Debug.LogError("Level already exists: " + name);
 			return false;
 		}
@@ -30,8 +30,8 @@ public class LevelEditorHandler : MonoBehaviour {
 		return true;
 	}
 
-	public void LoadLevel(bool resource, string name) {
-		LevelLoaded = LevelIO.LoadLevel(false, resource, true, transform, level, name);
+	public void LoadLevel(string name) {
+		LevelLoaded = LevelIO.LoadLevel(false, true, transform, level, name);
 		if (!LevelLoaded) {
 			Debug.Log("Could not load level from level editor handler: " + name);
 		}

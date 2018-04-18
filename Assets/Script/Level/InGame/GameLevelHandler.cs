@@ -16,7 +16,12 @@ public class GameLevelHandler : MonoBehaviour {
 		if (hasLevel) {
 			level.OnDestroy();
 		}
-		LevelLoaded = LevelIO.LoadLevel(true, resource, false, transform, level, name);
+		if (resource) {
+			Debug.LogError("Tried to load a resource level, but failed");
+			return;
+		} else {
+			LevelLoaded = LevelIO.LoadLevel(true, false, transform, level, name);
+		}
 		hasLevel = true;
 	}
 

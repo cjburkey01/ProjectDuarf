@@ -3,6 +3,7 @@
 public class GameHandler : MonoBehaviour {
 
 	public static bool IsPaused { private set; get; }
+	public static bool InGame { private set; get; }
 
 	public Camera placeholderCamera;
 
@@ -19,7 +20,7 @@ public class GameHandler : MonoBehaviour {
 	}
 
 	void Update() {
-		if (Input.GetButtonDown("Cancel")) {
+		if (Input.GetButtonDown("Cancel") && InGame) {
 			if (GUIHandler.IsShown()) {
 				GUIHandler.HideGui();
 			} else {
@@ -39,6 +40,7 @@ public class GameHandler : MonoBehaviour {
 			return;
 		}
 		GUIHandler.HideGui();
+		InGame = true;
 		placeholderCamera.gameObject.SetActive(false);
 	}
 

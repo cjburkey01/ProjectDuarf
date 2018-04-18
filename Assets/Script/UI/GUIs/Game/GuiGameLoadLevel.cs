@@ -48,12 +48,15 @@ public class GuiGameLoadLevel : GameGUI, ILevelSelector {
 		}
 	}
 
-	private void Replace(bool builtin) {
+	public void Replace(bool builtin) {
 		foreach (string level in LevelIO.GetLevels(builtin)) {
 			GameObject obj = Instantiate(levelDisplayPrefab, container.transform, false);
+			if (obj == null) {
+				continue;
+			}
 			LevelDisplay ld = obj.GetComponent<LevelDisplay>();
 			ld.levelLoader = this;
-			ld.SetLevelName(level.Substring(0, level.Length - 4));
+			ld.SetLevelName(level);
 		}
 		SetSelected(null);
 		buttonLoad.interactable = false;

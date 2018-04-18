@@ -11,6 +11,7 @@ public class GuiEditorMenu : GameGUI {
 	public Button buttonSave;
 	public Button buttonPicker;
 	public Button buttonExit;
+	public Button buttonExitNoSave;
 	
 	private bool init = false;
 
@@ -30,6 +31,7 @@ public class GuiEditorMenu : GameGUI {
 			buttonSave.onClick.AddListener(OnSaveClick);
 			buttonPicker.onClick.AddListener(OnPickerClick);
 			buttonExit.onClick.AddListener(OnExitClick);
+			buttonExitNoSave.onClick.AddListener(OnNoSaveExitClick);
 		}
 		buttonSave.interactable = levelEditorHandler.LevelLoaded;
 		buttonPicker.interactable = levelEditorHandler.LevelLoaded;
@@ -48,7 +50,6 @@ public class GuiEditorMenu : GameGUI {
 			return;
 		}
 		levelEditorHandler.SaveLevel();
-		GUIHandler.HideGui();
 	}
 
 	public void OnPickerClick() {
@@ -59,6 +60,13 @@ public class GuiEditorMenu : GameGUI {
 	}
 
 	public void OnExitClick() {
+		if (levelEditorHandler.LevelLoaded) {
+			levelEditorHandler.SaveLevel();
+		}
+		OnNoSaveExitClick();
+	}
+
+	public void OnNoSaveExitClick() {
 		SceneManager.LoadScene(0);
 	}
 

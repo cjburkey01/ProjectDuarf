@@ -56,8 +56,8 @@ public class GuiEditorNewLevel : GameGUI {
 	}
 
 	void Update() {
-		valida = LevelIO.IsValidName(inputName.text);
-		validb = !LevelIO.LevelExists(false, inputName.text);
+		valida = LevelIO.IsValidLevelName(inputName.text);
+		validb = !LevelIO.GetLevelExists(inputName.text);
 		buttonCreate.interactable = valida && validb;
 		if (!valida) {
 			error.text = invalidString;

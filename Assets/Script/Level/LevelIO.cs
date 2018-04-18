@@ -12,66 +12,25 @@ public static class LevelIO {
 		CreateDir(LevelDir);
 	}
 
+	private static string CreateLevelPath(string name) {
+		return LevelDir + name + ".lvl";
+	}
+
 	private static void CreateDir(string dir) {
 		if (!Directory.Exists(dir)) {
 			Directory.CreateDirectory(dir);
 		}
 	}
 
-	public static string[] GetLevels(bool resource) {
-		if (resource) {
-			TextAsset[] i = Resources.LoadAll<TextAsset>("/Level/");
-			List<String> ls = new List<string>();
-			foreach (TextAsset ta in i) {
-				ls.Add(ta.name);
-			}
-			return ls.ToArray();
-		}
-		List<String> levels = new List<string>();
-		foreach (string path in Directory.GetFiles(LevelDir)) {
-			string[] spl = path.Replace('\\', '/').Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-			levels.Add(spl[spl.Length - 1]);
-		}
-		return levels.ToArray();
-	}
-	
-	public static bool SaveLevel(LevelData level, string name) {
-		if (!IsValidName(name)) {
-			Debug.LogError("Invalid level name: " + name);
-			return false;
-		}
-		Debug.Log("Saving: " + GetFileName(name));
-		File.WriteAllText(GetFileName(name), level.Serialize(), System.Text.Encoding.UTF8);
-		return true;
-	}
-
-	public static bool LevelExists(bool resource, string name) {
-		name = name.Trim();
-		if (!IsValidName(name)) {
-			return false;
-		}
-		if (resource) {
-			return Resources.Load<TextAsset>(GetResName(name)) != null;
-		}
-		return File.Exists(GetFileName(name));
-	}
-
-	public static bool LoadLevel(bool init, bool resource, bool fullColliders, Transform levelParent, LevelData level, string name) {
-		if (resource) {
-			return LoadLevelFromResource(init, fullColliders, levelParent, level, name);
-		}
-		return LoadLevelFromFile(init, fullColliders, levelParent, level, name);
-	}
-	
-	public static bool LoadLevelFromFile(bool init, bool fullColliders, Transform levelParent, LevelData level, string name) {
+	private static bool LoadLevelFromFile(bool init, bool fullColliders, Transform levelParent, LevelData level, string name) {
 		if (name.EndsWith(".lvl", StringComparison.Ordinal)) {
 			name.Substring(0, name.Length - 4);
 		}
-		if (!LevelExists(false, name)) {
+		if (!GetLevelExists(name)) {
 			Debug.LogError("Level does not exist: " + name);
 			return false;
 		}
-		string fileName = GetFileName(name);
+		string fileName = GetLevelFileFromName(name);
 		Debug.Log("Loading level from file: " + fileName);
 		string file = null;
 		try {
@@ -87,34 +46,18 @@ public static class LevelIO {
 		return true;
 	}
 
-	public static bool LoadLevelFromResource(bool init, bool fullColliders, Transform levelParent, LevelData level, string name) {
-		if (!LevelExists(true, name)) {
-			Debug.LogError("Level does not exist as resource: " + name);
-			return false;
-		}
-		string resPath = GetResName(name);
-		Debug.Log("Loading level from resource: " + resPath);
-		TextAsset text = Resources.Load<TextAsset>(resPath);
-		if (text == null) {
-			Debug.LogError("Failed to load level resource: " + resPath);
-			return false;
-		}
-		LoadLevelFromString(init, fullColliders, levelParent, level, text.text);
-		return true;
-	}
-
-	public static void LoadLevelFromString(bool init, bool fullColliders, Transform levelParent, LevelData level, string serialized) {
+	private static void LoadLevelFromString(bool init, bool fullColliders, Transform levelParent, LevelData level, string serialized) {
 		level.Deserialize(init, fullColliders, levelParent, serialized);
 		Debug.Log("Deserialized level");
 	}
 
-	public static bool IsValidName(string name) {
+	public static bool IsValidLevelName(string name) {
 		name = name.Trim();
 		return name.Length > 3 && name.Length <= 26;
 	}
 
 	public static bool DeleteLevel(string name) {
-		string path = GetFileName(name);
+		string path = GetLevelFileFromName(name);
 		if (File.Exists(path)) {
 			File.Delete(path);
 			return true;
@@ -122,12 +65,73 @@ public static class LevelIO {
 		return false;
 	}
 
-	private static string GetFileName(string level) {
-		return LevelDir + level + ".lvl";
+	public static bool LoadLevel(bool init, bool fullColliders, Transform levelParent, LevelData level, string levelName) {
+		return LoadLevelFromFile(init, fullColliders, levelParent, level, levelName);
 	}
 
-	private static string GetResName(string level) {
-		return "/Level/" + level;
+	public static bool SaveLevel(LevelData level, string name) {
+		if (!IsValidLevelName(name)) {
+			Debug.LogError("Invalid level name: " + name);
+			return false;
+		}
+		Debug.Log("Saving: " + CreateLevelPath(name));
+		File.WriteAllText(CreateLevelPath(name), level.Serialize(), System.Text.Encoding.UTF8);
+		return true;
+	}
+
+	public static bool GetLevelExists(string name) {
+		foreach (string lvl in GetLevels(false)) {
+			if (lvl.Equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static string GetLevelFileFromName(string name) {
+		foreach (string file in GetFiles()) {
+			if (GetLevelNameFromPath(file).Equals(name)) {
+				return file;
+			}
+		}
+		return null;
+	}
+
+	public static string[] GetLevels(bool builtin) {
+		if (builtin) {
+			Debug.LogWarning("Refusing to load resource levels, not implemented yet");
+			return new string[0];
+		}
+		List<string> levels = new List<string>();
+		foreach (string path in Directory.GetFiles(LevelDir)) {
+			string name = GetLevelNameFromPath(path);
+			if (name != null) {
+				levels.Add(name);
+			}
+		}
+		return levels.ToArray();
+	}
+
+	private static string[] GetFiles() {
+		List<string> files = new List<string>();
+		foreach (string path in Directory.GetFiles(LevelDir)) {
+			if (path.EndsWith(".lvl", StringComparison.Ordinal)) {
+				files.Add(path);
+			}
+		}
+		return files.ToArray();
+	}
+
+	private static string GetLevelNameFromPath(string path) {
+		string inf = File.ReadAllText(path);
+		if (inf == null) {
+			return null;
+		}
+		string[] txt = inf.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+		if (txt.Length < 1) {
+			return null;
+		}
+		return txt[0];
 	}
 
 }

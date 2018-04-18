@@ -43,12 +43,12 @@ public class GuiEditorLoadLevel : GameGUI, ILevelSelector {
 		}
 	}
 
-	private void Replace() {
+	public void Replace() {
 		foreach (string level in LevelIO.GetLevels(false)) {
 			GameObject obj = Instantiate(levelDisplayPrefab, container.transform, false);
 			LevelDisplay ld = obj.GetComponent<LevelDisplay>();
 			ld.levelLoader = this;
-			ld.SetLevelName(level.Substring(0, level.Length - 4));
+			ld.SetLevelName(level);
 		}
 		SetSelected(null);
 		buttonLoad.interactable = false;
@@ -58,7 +58,7 @@ public class GuiEditorLoadLevel : GameGUI, ILevelSelector {
 		if (selected == null) {
 			return;
 		}
-		levelEditorHandler.LoadLevel(false, selected);
+		levelEditorHandler.LoadLevel(selected);
 		if (levelEditorHandler.LevelLoaded) {
 			GUIHandler.HideGui();
 		} else {
