@@ -15,15 +15,15 @@ public class GuiGameLoadLevel : GameGUI, ILevelSelector {
 	public Button buttonLoad;
 	public Button buttonCancel;
 	
-	private bool init = false;
-	private string selected = null;
+	bool init;
+	string selected;
 
 	public GuiGameLoadLevel() {
 		INSTANCE = this;
 	}
 
 	public override string GetUniqueName() {
-		return "GuiGameLoadLeveL";
+		return "GuiGameLoadLevel";
 	}
 
 	public override void OnShow(GameGUI previousGui) {

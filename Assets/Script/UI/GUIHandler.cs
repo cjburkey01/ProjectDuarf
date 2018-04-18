@@ -1,4 +1,4 @@
-﻿public class GUIHandler {
+﻿public static class GUIHandler {
 
 	public static GameGUI CurrentGUI { private set; get; }
 
@@ -15,11 +15,11 @@
 		ShowGui(null);
 	}
 
-	private static void ReplaceCurrentGui(GameGUI nextGui) {
+	static void ReplaceCurrentGui(GameGUI nextGui) {
 		ReplaceSpecificGui(CurrentGUI, nextGui);
 	}
 
-	private static void ReplaceSpecificGui(GameGUI gui, GameGUI nextGui) {
+	static void ReplaceSpecificGui(GameGUI gui, GameGUI nextGui) {
 		if (gui != null) {
 			gui.OnHide(nextGui);
 			gui.gameObject.SetActive(false);

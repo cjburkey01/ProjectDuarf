@@ -173,7 +173,7 @@ PlayerSettings:
   CreateWallpaper: 0
   APKExpansionFiles: 0
   keepLoadedShadersAlive: 0
-  StripUnusedMeshComponents: 0
+  StripUnusedMeshComponents: 1
   VertexChannelCompressionMask:
     serializedVersion: 2
     m_Bits: 238
@@ -232,7 +232,7 @@ PlayerSettings:
   iOSURLSchemes: []
   iOSBackgroundModes: 0
   iOSMetalForceHardShadows: 0
-  metalEditorSupport: 0
+  metalEditorSupport: 1
   metalAPIValidation: 1
   iOSRenderExtraFrameOnPause: 0
   appleDeveloperTeamID: 
@@ -262,6 +262,9 @@ PlayerSettings:
   - m_BuildTarget: WindowsStandaloneSupport
     m_APIs: 02000000
     m_Automatic: 1
+  - m_BuildTarget: MacStandaloneSupport
+    m_APIs: 1000000011000000
+    m_Automatic: 0
   m_BuildTargetVRSettings: []
   m_BuildTargetEnableVuforiaSettings: []
   openGLRequireES31: 0

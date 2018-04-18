@@ -64,7 +64,7 @@ public static class LevelIO {
 	}
 	
 	public static bool LoadLevelFromFile(bool init, bool fullColliders, Transform levelParent, LevelData level, string name) {
-		if (name.EndsWith(".lvl")) {
+		if (name.EndsWith(".lvl", StringComparison.Ordinal)) {
 			name.Substring(0, name.Length - 4);
 		}
 		if (!LevelExists(false, name)) {
@@ -111,6 +111,15 @@ public static class LevelIO {
 	public static bool IsValidName(string name) {
 		name = name.Trim();
 		return name.Length > 3 && name.Length <= 26;
+	}
+
+	public static bool DeleteLevel(string name) {
+		string path = GetFileName(name);
+		if (File.Exists(path)) {
+			File.Delete(path);
+			return true;
+		}
+		return false;
 	}
 
 	private static string GetFileName(string level) {

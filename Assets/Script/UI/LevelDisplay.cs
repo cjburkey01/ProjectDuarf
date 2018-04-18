@@ -7,7 +7,7 @@ public class LevelDisplay : MonoBehaviour {
 
 	public ILevelSelector levelLoader;
 
-	private Text text;
+	Text text;
 
 	void Start() {
 		text = GetComponentInChildren<Text>();
@@ -25,6 +25,11 @@ public class LevelDisplay : MonoBehaviour {
 
 	public void OnClick() {
 		levelLoader.SetSelected(LevelName);
+	}
+
+	public void OnDelete() {
+		GuiConfirmDelete.INSTANCE.levelName = LevelName;
+		GUIHandler.ShowGui(GuiConfirmDelete.INSTANCE);
 	}
 	
 }

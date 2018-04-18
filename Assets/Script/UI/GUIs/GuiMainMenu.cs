@@ -12,7 +12,7 @@ public class GuiMainMenu : GameGUI {
 	public Button buttonSettings;
 	public Button buttonQuit;
 
-	private bool init = false;
+	bool init;
 
 	public GuiMainMenu() {
 		INSTANCE = this;
