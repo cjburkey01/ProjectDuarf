@@ -8,18 +8,20 @@ public class PlayerMovement : MonoBehaviour {
 	public float jumpHalfTime = 0.35f;
 	public float moveSpeed = 6.0f;
 	public float moveAccelerationTime = 0.1f;
+	public int maxJumps = 1;
 	
-	private Vector2 input;
-	private Vector2 velocity;
-	private PlayerController controller;
-	private float plyGravity;
-	private float jumpVelocity;
+	Vector2 input;
+	Vector2 velocity;
+	PlayerController controller;
+	float plyGravity;
+	float jumpVelocity;
+	int jumps;
 
-	private bool left;
-	private bool right;
-	private bool pleft;
-	private bool pright;
-	private float time;
+	bool left;
+	bool right;
+	bool pleft;
+	bool pright;
+	float time;
 
 	void Start() {
 		controller = GetComponent<PlayerController>();
@@ -46,7 +48,7 @@ public class PlayerMovement : MonoBehaviour {
 		controller.Move(velocity * Time.deltaTime);
 	}
 
-	private void DoMovement() {
+	void DoMovement() {
 		left = Mathf.Approximately(Input.GetAxisRaw("Horizontal"), -1.0f);
 		right = Mathf.Approximately(Input.GetAxisRaw("Horizontal"), 1.0f);
 		if (left != pleft || right != pright) {
@@ -57,8 +59,13 @@ public class PlayerMovement : MonoBehaviour {
 		time += Time.deltaTime;
 		input.x = Mathf.Lerp(input.x, moveSpeed * Input.GetAxisRaw("Horizontal"), time / moveAccelerationTime);
 		input.y = 0.0f;
-		if (controller.IsCollidingDown && Input.GetButtonDown("Jump")) {
+		if (controller.IsCollidingDown) {
+			jumps = 0;
+		}
+		if ((jumps < maxJumps && velocity.y <= 0.0f) && Input.GetButtonDown("Jump")) {
 			input.y = jumpVelocity;
+			velocity.y = 0.0f;
+			jumps++;
 		}
 	}
 

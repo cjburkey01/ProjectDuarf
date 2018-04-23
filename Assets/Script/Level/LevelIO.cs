@@ -12,17 +12,17 @@ public static class LevelIO {
 		CreateDir(LevelDir);
 	}
 
-	private static string CreateLevelPath(string name) {
+	static string CreateLevelPath(string name) {
 		return LevelDir + name + ".lvl";
 	}
 
-	private static void CreateDir(string dir) {
+	static void CreateDir(string dir) {
 		if (!Directory.Exists(dir)) {
 			Directory.CreateDirectory(dir);
 		}
 	}
 
-	private static bool LoadLevelFromFile(bool init, bool fullColliders, Transform levelParent, LevelData level, string name) {
+	static bool LoadLevelFromFile(bool init, bool fullColliders, Transform levelParent, LevelData level, string name) {
 		if (name.EndsWith(".lvl", StringComparison.Ordinal)) {
 			name.Substring(0, name.Length - 4);
 		}
@@ -46,7 +46,7 @@ public static class LevelIO {
 		return true;
 	}
 
-	private static void LoadLevelFromString(bool init, bool fullColliders, Transform levelParent, LevelData level, string serialized) {
+	static void LoadLevelFromString(bool init, bool fullColliders, Transform levelParent, LevelData level, string serialized) {
 		level.Deserialize(init, fullColliders, levelParent, serialized);
 		Debug.Log("Deserialized level");
 	}
@@ -88,7 +88,7 @@ public static class LevelIO {
 		return false;
 	}
 
-	private static string GetLevelFileFromName(string name) {
+	static string GetLevelFileFromName(string name) {
 		foreach (string file in GetFiles()) {
 			if (GetLevelNameFromPath(file).Equals(name)) {
 				return file;
@@ -112,7 +112,7 @@ public static class LevelIO {
 		return levels.ToArray();
 	}
 
-	private static string[] GetFiles() {
+	static string[] GetFiles() {
 		List<string> files = new List<string>();
 		foreach (string path in Directory.GetFiles(LevelDir)) {
 			if (path.EndsWith(".lvl", StringComparison.Ordinal)) {
@@ -122,7 +122,10 @@ public static class LevelIO {
 		return files.ToArray();
 	}
 
-	private static string GetLevelNameFromPath(string path) {
+	static string GetLevelNameFromPath(string path) {
+		if (!path.EndsWith(".lvl", StringComparison.Ordinal)) {
+			return null;
+		}
 		string inf = File.ReadAllText(path);
 		if (inf == null) {
 			return null;
