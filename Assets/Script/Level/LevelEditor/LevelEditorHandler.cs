@@ -42,8 +42,6 @@ public class LevelEditorHandler : MonoBehaviour {
 	}
 
 	void Start() {
-		TileInitialization.Init();
-		LevelIO.InitIO();
 		movingObject.UpdateGrid(gridWidth, gridSize);
 	}
 

@@ -3,11 +3,16 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RegisterEventHandlers]
 public static class LevelIO {
 
 	public static string LevelDir { private set; get; }
 
-	public static void InitIO() {
+	static void RegisterEvents() {
+		EventObject.EventSystem.AddListener<EventGameInit>(InitIO);
+	}
+
+	static void InitIO<T>(T e) where T : EventGameInit {
 		LevelDir = Application.persistentDataPath.Replace('\\', '/') + "/Levels/";
 		CreateDir(LevelDir);
 	}

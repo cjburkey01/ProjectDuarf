@@ -5,12 +5,12 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class PlayerController : MonoBehaviour {
 
-    public float skinWidth = 0.01f;
+	public float skinWidth = 0.01f;
 	public float maxSlopeAngle = 45.0f;
 	public int raysForBottom = 5;
-    public int raysForTop = 3;
-    public int raysForRight = 5;
-    public int raysForLeft = 5;
+	public int raysForTop = 3;
+	public int raysForRight = 5;
+	public int raysForLeft = 5;
 	public LayerMask collidingLayersTop;
 	public LayerMask collidingLayersBottom;
 	public LayerMask collidingLayersLeft;
@@ -25,20 +25,20 @@ public class PlayerController : MonoBehaviour {
 	public float SlopeAngle { private set; get; }
 	public float SlopeAnglePrev { private set; get; }
 
-	private BoxCollider2D plyColl;
-	private readonly List<CollisionRay> rays = new List<CollisionRay>();
-	private Vector2 velocity;
+	BoxCollider2D plyColl;
+	readonly List<CollisionRay> rays = new List<CollisionRay>();
+	Vector2 velocity;
 
-    void Start() {
+	void Start() {
 		plyColl = GetComponent<BoxCollider2D>();
 		if (plyColl == null) {
 			Debug.LogError("PlayerController object does not have a BoxCollider2D present, disabling");
-			enabled = false;	// Disable this script, it's useless without the collider.
+			enabled = false;    // Disable this script, it's useless without the collider.
 		}
 		UpdateCollisionDetection();
-    }
+	}
 
-    void Update() {
+	void Update() {
 		// Reset variables
 		IsCollidingDown = false;
 		IsCollidingUp = false;
@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour {
 			}
 
 			Vector2 s = ray.start + new Vector2(transform.position.x, transform.position.y);
-			Debug.DrawLine(s + velocity, s + velocity + rayLength * ray.direction, Color.red);	// Velocity render
+			Debug.DrawLine(s + velocity, s + velocity + rayLength * ray.direction, Color.red);  // Velocity render
 			RaycastHit2D[] hits = new RaycastHit2D[1];
 
 			if (Physics2D.Raycast(s, ray.direction, ray.filter, hits, rayLength) > 0) {
@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour {
 				float angle = Vector2.Angle(hits[0].normal, Vector2.up);
 				if (ray.bottomHoriz && angle <= maxSlopeAngle) {
 					float dist = 0.0f;
-					if (angle != SlopeAnglePrev) {
+					if (!Mathf.Approximately(angle, SlopeAnglePrev)) {
 						dist = (hits[0].distance - skinWidth) * Mathf.Sign(velocity.x);
 						velocity.x -= dist;
 					}
@@ -97,7 +97,7 @@ public class PlayerController : MonoBehaviour {
 						velocity.x = Mathf.Min(velocity.x, hits[0].distance - skinWidth);
 						IsCollidingRight = true;
 					}
-					
+
 					// Slope helper
 					if (IsClimbing) {
 						velocity.y = Mathf.Tan(SlopeAngle * Mathf.Deg2Rad) * Mathf.Abs(velocity.x); // If an object is on the slope a blocking the player's path
@@ -113,7 +113,7 @@ public class PlayerController : MonoBehaviour {
 						IsCollidingUp = true;
 					}
 				}
-				
+
 				// Another slope helper
 				if (IsClimbing) {
 					velocity.x = velocity.y / Mathf.Tan(SlopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x); // If an object is above the player on a slope
@@ -122,7 +122,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		transform.position += new Vector3(velocity.x, velocity.y, 0.0f);
-		velocity = Vector2.zero;	// Velocity is handled by the player movement motor, not the character controller
+		velocity = Vector2.zero;    // Velocity is handled by the player movement motor, not the character controller
 	}
 
 	public void DoDestroy() {
@@ -142,8 +142,8 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	// Reset the rays to use when calculating collisions (we only need to call this if the collider size is changed)
-    public void UpdateCollisionDetection() {
-        rays.Clear();
+	public void UpdateCollisionDetection() {
+		rays.Clear();
 
 		float pDefX = skinWidth + GetTranslatedMin().y;
 		float pDefY = skinWidth + GetTranslatedMin().x;
@@ -161,13 +161,13 @@ public class PlayerController : MonoBehaviour {
 			rays.Add(new CollisionRay(collidingLayersTop, new Vector2(pos, GetTranslatedMax().y - skinWidth), Vector2.up));
 			pos += topSpacing;
 		}
-		pos = pDefY;	// Reset the temporary position storage for the next ray set. This just cuts down extra variables.
+		pos = pDefY;    // Reset the temporary position storage for the next ray set. This just cuts down extra variables.
 
 		// Rays going downards
-        for (int i = 0; i < raysForBottom; i ++) {
+		for (int i = 0; i < raysForBottom; i++) {
 			rays.Add(new CollisionRay(collidingLayersBottom, new Vector2(pos, GetTranslatedMin().y + skinWidth), Vector2.down));
 			pos += bottomSpacing;
-        }
+		}
 		pos = pDefX;
 
 		// Rays going right
@@ -182,7 +182,7 @@ public class PlayerController : MonoBehaviour {
 			rays.Add(new CollisionRay(collidingLayersLeft, new Vector2(GetTranslatedMin().x + skinWidth, pos), Vector2.left, i == 0));
 			pos += leftSpacing;
 		}
-    }
+	}
 
 	// Tells the controller to move the player by the specified amount
 	// This value must be pre-multiplied by Time.deltaTime, it is not

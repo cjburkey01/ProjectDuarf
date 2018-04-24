@@ -3,13 +3,13 @@
 // This script controlls the PlayerController
 [RequireComponent(typeof(PlayerController))]
 public class PlayerMovement : MonoBehaviour {
-	
+
 	public float jumpHeight = 2.5f;
 	public float jumpHalfTime = 0.35f;
 	public float moveSpeed = 6.0f;
 	public float moveAccelerationTime = 0.1f;
 	public int maxJumps = 1;
-	
+
 	Vector2 input;
 	Vector2 velocity;
 	PlayerController controller;
@@ -67,6 +67,10 @@ public class PlayerMovement : MonoBehaviour {
 			velocity.y = 0.0f;
 			jumps++;
 		}
+	}
+
+	public void SetVelocity(Vector2 velocity) {
+		this.velocity = velocity;
 	}
 
 }

@@ -1,21 +1,29 @@
 ﻿using UnityEngine;
 
+[RegisterEventHandlers]
 public class GameHandler : MonoBehaviour {
 
 	public static bool IsPaused { private set; get; }
 	public static bool InGame { private set; get; }
+	static GameHandler instance;
 
 	public Camera placeholderCamera;
+
+	public GameHandler() {
+		instance = this;
+	}
 
 	public bool LevelLoaded {
 		get {
 			return GameLevelHandler.INSTANCE.LevelLoaded;
 		}
 	}
-	
-	void Start() {
-		TileInitialization.Init();
-		LevelIO.InitIO();
+
+	static void RegisterEvents() {
+		EventObject.EventSystem.AddListener<EventGameInit>(instance.OnStart);
+	}
+
+	void OnStart<T>(T e) where T : EventGameInit {
 		GUIHandler.ShowGui(GuiMainMenu.INSTANCE);
 	}
 

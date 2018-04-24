@@ -16,7 +16,7 @@ public class ButtonFinderInjector : MonoBehaviour {
 	int j;
 	int k;
 
-	void Start() {
+	void Awake() {
 		InjectColors();
 	}
 
@@ -34,11 +34,11 @@ public class ButtonFinderInjector : MonoBehaviour {
 		};
 		foreach (Button btn in Resources.FindObjectsOfTypeAll<Button>()) {
 			if (btn.gameObject.scene.name == null) {
-				k ++;
+				k++;
 				continue;
 			}
 			if (btn.gameObject.GetComponent<IgnoreColorInject>() != null) {
-				j ++;
+				j++;
 				continue;
 			}
 			bool wasActive = btn.gameObject.activeSelf;
@@ -46,7 +46,7 @@ public class ButtonFinderInjector : MonoBehaviour {
 				btn.gameObject.SetActive(true);
 			}
 			btn.colors = cbl;
-			i ++;
+			i++;
 			btn.gameObject.SetActive(wasActive);
 		}
 		Debug.Log("Colored " + i + " buttons with default colors, ignored " + j + " buttons and " + k + " prefabs");

@@ -2,7 +2,7 @@
 
 [RequireComponent(typeof(Camera))]
 public class CameraMove : MonoBehaviour {
-	
+
 	public float smoothing = 0.1f;
 	public float moveSpeed = 10.0f;
 	public float zoomSpeed = 150.0f;
