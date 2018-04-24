@@ -19,8 +19,12 @@ public class Player : PowerupHandler {
 		HandlePowerupTick(this);
 	}
 
-	void OnTriggerEnter2D(Collider2D collision) {
-		PowerUp pu = collision.gameObject.GetComponent<PowerUp>();
+	// Custom trigger enter method, called by custom 2D character controller
+	void OnTriggeredEnter(Transform other) {
+		if (other.gameObject == null) {
+			return;
+		}
+		PowerUp pu = other.gameObject.GetComponent<PowerUp>();
 		if (pu != null) {
 			AddPowerup(this, pu);
 			Destroy(pu.gameObject);
@@ -28,6 +32,7 @@ public class Player : PowerupHandler {
 	}
 
 	public void Kill() {
+		ClearPowerups(this);
 		EventObject.EventSystem.TriggerEvent(new PlayerDeathEvent(this));
 		PlayerMotor.SetVelocity(Vector2.zero);
 		transform.position = spawnPos;

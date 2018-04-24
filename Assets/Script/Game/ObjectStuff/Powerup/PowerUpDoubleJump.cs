@@ -1,17 +1,17 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿public class PowerUpDoubleJump : PowerUp {
 
-public class PowerUpDoubleJump : PowerUp {
-
+	public int jumps = 2;
 	public float time = 15.0f;
+
+	int defaultJumps;
 
 	public override string GetUniqueName() {
 		return "PowerUpDoubleJump";
 	}
 
 	public override void OnPickup(Player ply) {
-		
+		defaultJumps = ply.PlayerMotor.maxJumps;
+		ply.PlayerMotor.maxJumps = jumps;
 	}
 
 	public override float GetLength() {
@@ -19,7 +19,7 @@ public class PowerUpDoubleJump : PowerUp {
 	}
 
 	public override void OnExpire(Player ply) {
-
+		ply.PlayerMotor.maxJumps = defaultJumps;
 	}
 
 }

@@ -165,16 +165,16 @@ MonoBehaviour:
   raysForLeft: 5
   collidingLayersTop:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 3072
   collidingLayersBottom:
     serializedVersion: 2
-    m_Bits: 1536
+    m_Bits: 3584
   collidingLayersLeft:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 3072
   collidingLayersRight:
     serializedVersion: 2
-    m_Bits: 1024
+    m_Bits: 3072
 --- !u!114 &114402999632192706
 MonoBehaviour:
   m_ObjectHideFlags: 1

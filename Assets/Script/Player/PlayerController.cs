@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
+using System;
 using UnityEngine;
 
 // This script is similar to CharacterController in 3D, it does no movement on its own.
@@ -29,6 +31,9 @@ public class PlayerController : MonoBehaviour {
 	readonly List<CollisionRay> rays = new List<CollisionRay>();
 	Vector2 velocity;
 
+	readonly List<string> triggerWithLast = new List<string>();
+	readonly List<string> triggerWith = new List<string>();
+
 	void Start() {
 		plyColl = GetComponent<BoxCollider2D>();
 		if (plyColl == null) {
@@ -47,6 +52,59 @@ public class PlayerController : MonoBehaviour {
 		IsClimbing = false;
 		SlopeAnglePrev = SlopeAngle;
 		SlopeAngle = 0.0f;
+
+		/* Begin ugliest code I've ever written */
+
+		// Reset triggers for next frame
+		triggerWithLast.Clear();
+		triggerWithLast.AddRange(triggerWith);
+		triggerWith.Clear();
+
+		// Determine how many colliders we intersect that are triggers
+		foreach (BoxCollider2D obj in FindObjectsOfType<BoxCollider2D>()) {
+			if (!obj.bounds.Intersects(plyColl.bounds) || obj.gameObject.layer != 11) {
+				continue;   // Doesn't intersect or isn't a trigger, move on.
+			}
+			foreach (MonoBehaviour mb in GetComponents<MonoBehaviour>()) {
+				try {
+					if (!triggerWithLast.Contains(obj.gameObject.name) && !triggerWith.Contains(obj.gameObject.name)) {
+						MethodInfo m1 = mb.GetType().GetMethod("OnTriggeredEnter", BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof(Transform) }, null);
+						if (m1 != null) {
+							m1.Invoke(mb, new object[] { obj.gameObject.gameObject.transform });
+						}
+					}
+					MethodInfo m2 = mb.GetType().GetMethod("OnTriggered", BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof(Transform) }, null);
+					if (m2 != null) {
+						m2.Invoke(mb, new object[] { obj.gameObject.gameObject.transform });
+					}
+				} catch (Exception e) {
+					Debug.LogError("Error: " + e.Message);
+				}
+			}
+			triggerWith.Add(obj.gameObject.gameObject.name);
+		}
+
+		// Determine the triggers that were called last frame but not this one, and call the according methods
+		foreach (string obj in triggerWithLast) {
+			if (triggerWith.Contains(obj)) {
+				//Debug.Log(obj);
+				continue;
+			}
+			MonoBehaviour[] mbs = GetComponents<MonoBehaviour>();
+			foreach (MonoBehaviour mb in mbs) {
+				try {
+					MethodInfo m2 = mb.GetType().GetMethod("OnTriggeredExit", BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof(Transform) }, null);
+					if (m2 != null) {
+						GameObject o = GameObject.Find(obj);
+						m2.Invoke(mb, new object[] { ((o == null) ? default(Transform) : o.transform) });
+					}
+				} catch (Exception e) {
+					Debug.LogError("Error: " + e.Message);
+				}
+			}
+		}
+
+		/* End ugliest code I've ever written */
 
 		foreach (CollisionRay ray in rays) {
 			// Basically determines how much of the this vector matches with velocity,
@@ -75,6 +133,11 @@ public class PlayerController : MonoBehaviour {
 			RaycastHit2D[] hits = new RaycastHit2D[1];
 
 			if (Physics2D.Raycast(s, ray.direction, ray.filter, hits, rayLength) > 0) {
+				// If is a trigger
+				if (hits[0].collider.gameObject.layer == 11) {
+					continue;
+				}
+
 				// Slope handling
 				float angle = Vector2.Angle(hits[0].normal, Vector2.up);
 				if (ray.bottomHoriz && angle <= maxSlopeAngle) {
@@ -129,7 +192,7 @@ public class PlayerController : MonoBehaviour {
 		Destroyed = true;
 	}
 
-	private void ClimbSlope(float angle) {
+	void ClimbSlope(float angle) {
 		float dist = Mathf.Abs(velocity.x);
 		float climbVelY = Mathf.Sin(angle * Mathf.Deg2Rad) * dist;
 		if (velocity.y <= climbVelY) {
@@ -193,11 +256,11 @@ public class PlayerController : MonoBehaviour {
 		this.velocity += velocity;
 	}
 
-	private Vector2 GetTranslatedMin() {
+	Vector2 GetTranslatedMin() {
 		return plyColl.bounds.min - transform.position;
 	}
 
-	private Vector2 GetTranslatedMax() {
+	Vector2 GetTranslatedMax() {
 		return plyColl.bounds.max - transform.position;
 	}
 
