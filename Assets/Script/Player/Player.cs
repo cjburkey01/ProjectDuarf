@@ -16,13 +16,13 @@ public class Player : PowerupHandler {
 	}
 
 	void Update() {
-		HandlePowerupTick();
+		HandlePowerupTick(this);
 	}
 
 	void OnTriggerEnter2D(Collider2D collision) {
 		PowerUp pu = collision.gameObject.GetComponent<PowerUp>();
 		if (pu != null) {
-			AddPowerup(pu);
+			AddPowerup(this, pu);
 			Destroy(pu.gameObject);
 		}
 	}
