@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class TileBasic : TileInfo {
 
@@ -26,7 +25,7 @@ public class TileBasic : TileInfo {
 		return iconPath;
 	}
 
-	public override bool DoCustomInstantiation(bool init, Vector2 pos, float z, out GameObject obj) {
+	public override bool DoCustomInstantiation(bool init, Vector2 pos, float z, TileData tile, out GameObject obj) {
 		obj = new GameObject("Tile " + iconPath);
 		SpriteRenderer spren = obj.AddComponent<SpriteRenderer>();
 		BoxCollider2D coll = obj.AddComponent<BoxCollider2D>();

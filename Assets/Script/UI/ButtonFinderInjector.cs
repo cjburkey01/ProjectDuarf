@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 public class ButtonFinderInjector : MonoBehaviour {
 
+	// Essentially, this class with locate all buttons and style them with the supplied colors.
+	// It prevents us from having to edit every button we create.
+
 	public static ButtonFinderInjector INSTANCE { private set; get; }
 
 	public Color defaultColor;

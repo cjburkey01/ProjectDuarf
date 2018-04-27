@@ -21,7 +21,13 @@ public class PDEventHandler<T> where T : PDEvent {
 	}
 
 	public void TriggerEvent(T e) {
+		if (ReferenceEquals(e, null)) {
+			return;
+		}
 		foreach (OnEvent<T> listener in listeners) {
+			if (listener == null) {
+				continue;
+			}
 			listener.Invoke(e);
 			if (e.IsCancellable() && e.IsCancelled()) {
 				return;

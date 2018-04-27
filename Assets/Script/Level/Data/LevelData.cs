@@ -6,7 +6,7 @@ public class LevelData {
 
 	public string Name { private set; get; }
 
-	private readonly List<TileData> tiles = new List<TileData>();
+	readonly List<TileData> tiles = new List<TileData>();
 
 	public LevelData(string name) {
 		Name = name;
@@ -38,6 +38,7 @@ public class LevelData {
 	public bool AddTile(bool init, Transform parent, TileData tile) {
 		if (InstantiateTile(init, parent, tile) != null) {
 			tiles.Add(tile);
+			tile.Tile.OnAdd(tile);
 			return true;
 		}
 		return false;
@@ -66,8 +67,15 @@ public class LevelData {
 		if (at == null) {
 			return;
 		}
-		at.Destroy();
-		tiles.Remove(at);
+		RemoveTile(at);
+	}
+
+	public void RemoveTile(TileData tile) {
+		if (tile == null) {
+			return;
+		}
+		tile.Destroy();
+		tiles.Remove(tile);
 	}
 
 	public TileData GetTileAt(Vector2 position) {
@@ -91,6 +99,7 @@ public class LevelData {
 		return data;
 	}
 
+	// One of the ugliest methods I have ever written
 	public void Deserialize(bool init, bool fullColliders, Transform parent, string serialized) {
 		tiles.Clear();
 		foreach (Transform t in parent) {
@@ -131,7 +140,7 @@ public class LevelData {
 
 	public static GameObject InstantiateTile(bool init, Transform parent, TileData data) {
 		GameObject instance = null;
-		if (data.Tile.DoCustomInstantiation(init, data.Position, data.Z, out instance)) {
+		if (data.Tile.DoCustomInstantiation(init, data.Position, data.Z, data, out instance)) {
 			if (ReferenceEquals(instance, null)) {
 				Debug.LogError("Unable to instantiate tile: " + data.Tile.GetResourceName() + ", the custom instantiation returned null");
 				return null;

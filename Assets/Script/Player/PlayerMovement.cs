@@ -62,7 +62,7 @@ public class PlayerMovement : MonoBehaviour {
 		if (controller.IsCollidingDown) {
 			jumps = 0;
 		}
-		if ((jumps < maxJumps && velocity.y <= 0.0f) && Input.GetButtonDown("Jump")) {
+		if ((Input.GetButton("Jump") && jumps == 0) || (Input.GetButtonDown("Jump") && (jumps < maxJumps && velocity.y <= 0.0f))) {
 			input.y = jumpVelocity;
 			velocity.y = 0.0f;
 			jumps++;

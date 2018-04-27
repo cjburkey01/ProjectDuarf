@@ -29,6 +29,16 @@ public class TileData {
 		}
 	}
 
+	public void OnDataUpdate(TileDataCustomizationWrapper changed, object value) {
+		Debug.Log("Set " + changed.GetName() + " to " + changed.GetSerialized(value));
+		Data.Set(changed.GetName(), changed.GetSerialized(value));
+		Tile.OnDataUpdate(changed, this);
+	}
+
+	public ISerializableData GetData(TileDataCustomizationWrapper data) {
+		return data.Get(Data);
+	}
+
 	public string Serialize() {
 		return "\"" + Tile.GetResourceName() + "\"(" + Position.x + "," + Position.y + "," + Z + ")[" + Data.Serialize() + "]" + Tile.Serialize(this);
 	}

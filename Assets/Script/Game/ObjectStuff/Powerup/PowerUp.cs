@@ -2,17 +2,15 @@
 
 public abstract class PowerUp : MonoBehaviour {
 
+	public TileData tile;
+	public float length = 15.0f;
+
 	public abstract string GetUniqueName();
 
 	public abstract void OnPickup(Player ply);
 
 	/// <summary>
-	/// 	Time, in seconds, of the effect. Set to a value less than or equal to 0.0f to disable
-	/// </summary>
-	public abstract float GetLength();
-
-	/// <summary>
-	/// 	Called when the powerup has existed for its length and is going to be removed from the player (is not called when GetLength() returns any value less than
+	/// 	Called when the powerup has existed for its length and is going to be removed from the player (is not called when <c>GetLength()</c> returns any value less than
 	/// 	or equal to 0.0f
 	/// </summary>
 	public virtual void OnExpire(Player ply) {
@@ -22,6 +20,15 @@ public abstract class PowerUp : MonoBehaviour {
 	/// 	Called for every frame that the powerup is in effect on the player
 	/// </summary>
 	public virtual void OnTick(Player ply) {
+	}
+
+	public abstract Sprite GetSprite();
+
+	/// <summary>
+	///		If true, then <c>OnExpire</c> and <c>OnTick</c> are not called, but the powerup is not destroyed when it is enabled
+	/// </summary>
+	public virtual bool GetIsReusable() {
+		return false;
 	}
 
 	public override bool Equals(object other) {

@@ -8,7 +8,10 @@ public class TilePlaceholder : TileInfo {
 	readonly bool limitOne;
 	readonly System.Guid uuid;
 
-	public TilePlaceholder(string prefabPath, string name, string iconPath, bool limitOne) {
+	public TilePlaceholder(string prefabPath, string name, string iconPath, bool limitOne) : this(prefabPath, name, iconPath, limitOne, new TileDataCustomizationWrapper[0]) {
+	}
+
+	public TilePlaceholder(string prefabPath, string name, string iconPath, bool limitOne, TileDataCustomizationWrapper[] data) : base(data) {
 		this.prefabPath = prefabPath;
 		this.name = name;
 		this.iconPath = iconPath;
@@ -26,7 +29,7 @@ public class TilePlaceholder : TileInfo {
 		return iconPath;
 	}
 
-	public override bool DoCustomInstantiation(bool init, Vector2 pos, float z, out GameObject obj) {
+	public override bool DoCustomInstantiation(bool init, Vector2 pos, float z, TileData tile, out GameObject obj) {
 		obj = null;
 		if (!init) {
 			// In the editor

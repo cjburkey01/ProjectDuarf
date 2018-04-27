@@ -1,9 +1,12 @@
-using UnityEngine;
 using System.Collections.Generic;
 
 public class DataHandler {
 
-	private readonly Dictionary<string, string> data = new Dictionary<string, string>();
+	readonly Dictionary<string, string> data = new Dictionary<string, string>();
+
+	public bool GetHasKey(string key) {
+		return data.ContainsKey(key);
+	}
 
 	public void Set(string key, string value) {
 		if (data.ContainsKey(key)) {
@@ -11,6 +14,24 @@ public class DataHandler {
 		} else {
 			data.Add(key, value);
 		}
+	}
+
+	public byte GetByte(string key) {
+		string at = Get(key);
+		byte res;
+		if (at == null || !byte.TryParse(at, out res)) {
+			return byte.MinValue;
+		}
+		return res;
+	}
+
+	public short GetShort(string key) {
+		string at = Get(key);
+		short res;
+		if (at == null || !short.TryParse(at, out res)) {
+			return short.MinValue;
+		}
+		return res;
 	}
 
 	public int GetInt(string key) {

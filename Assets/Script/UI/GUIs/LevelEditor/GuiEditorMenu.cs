@@ -12,7 +12,7 @@ public class GuiEditorMenu : GameGUI {
 	public Button buttonPicker;
 	public Button buttonExit;
 	public Button buttonExitNoSave;
-	
+
 	private bool init = false;
 
 	public GuiEditorMenu() {
@@ -35,6 +35,7 @@ public class GuiEditorMenu : GameGUI {
 		}
 		buttonSave.interactable = levelEditorHandler.LevelLoaded;
 		buttonPicker.interactable = levelEditorHandler.LevelLoaded;
+		buttonExit.interactable = levelEditorHandler.LevelLoaded;
 	}
 
 	public void OnNewClick() {

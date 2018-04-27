@@ -1,10 +1,16 @@
 ﻿using UnityEngine;
 
-public class Player : PowerupHandler {
+public class Player : MonoBehaviour {
+
+	public static Player INSTANCE { private set; get; }
 
 	public PlayerMovement PlayerMotor { private set; get; }
 
 	Vector3 spawnPos;
+
+	public Player() {
+		INSTANCE = this;
+	}
 
 	void Start() {
 		PlayerMotor = GetComponent<PlayerMovement>();
@@ -16,7 +22,7 @@ public class Player : PowerupHandler {
 	}
 
 	void Update() {
-		HandlePowerupTick(this);
+		PowerupHandler.HandlePowerupTick();
 	}
 
 	// Custom trigger enter method, called by custom 2D character controller
@@ -26,13 +32,13 @@ public class Player : PowerupHandler {
 		}
 		PowerUp pu = other.gameObject.GetComponent<PowerUp>();
 		if (pu != null) {
-			AddPowerup(this, pu);
+			PowerupHandler.AddPowerup(pu);
 			Destroy(pu.gameObject);
 		}
 	}
 
 	public void Kill() {
-		ClearPowerups(this);
+		PowerupHandler.ClearPowerups();
 		EventObject.EventSystem.TriggerEvent(new PlayerDeathEvent(this));
 		PlayerMotor.SetVelocity(Vector2.zero);
 		transform.position = spawnPos;

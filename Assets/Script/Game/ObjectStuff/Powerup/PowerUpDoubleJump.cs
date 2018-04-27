@@ -1,9 +1,15 @@
-﻿public class PowerUpDoubleJump : PowerUp {
+﻿using UnityEngine;
+
+public class PowerUpDoubleJump : PowerUp {
 
 	public int jumps = 2;
-	public float time = 15.0f;
 
 	int defaultJumps;
+	Sprite spr;
+
+	void Awake() {
+		spr = Resources.Load<Sprite>("Tile/Placeholder/PowerUp/DoubleJump");
+	}
 
 	public override string GetUniqueName() {
 		return "PowerUpDoubleJump";
@@ -14,12 +20,12 @@
 		ply.PlayerMotor.maxJumps = jumps;
 	}
 
-	public override float GetLength() {
-		return time;
-	}
-
 	public override void OnExpire(Player ply) {
 		ply.PlayerMotor.maxJumps = defaultJumps;
+	}
+
+	public override Sprite GetSprite() {
+		return spr;
 	}
 
 }

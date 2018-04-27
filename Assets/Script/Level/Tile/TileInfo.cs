@@ -1,14 +1,24 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public abstract class TileInfo {
 
 	public abstract string GetResourceName();
 	public abstract string GetIconResourceName();
 
+	protected readonly List<TileDataCustomizationWrapper> tileDatas = new List<TileDataCustomizationWrapper>();
+
+	protected TileInfo() {
+	}
+
+	protected TileInfo(TileDataCustomizationWrapper[] data) {
+		tileDatas.AddRange(data);
+	}
+
 	/// <summary>
 	///		Returns false if the default initialization is to be done
 	/// </summary>
-	public virtual bool DoCustomInstantiation(bool init, Vector2 pos, float z, out GameObject obj) {
+	public virtual bool DoCustomInstantiation(bool init, Vector2 pos, float z, TileData tile, out GameObject obj) {
 		obj = null;
 		return false;
 	}
@@ -22,6 +32,9 @@ public abstract class TileInfo {
 	public virtual void OnCreate(TileData self) {
 	}
 
+	public virtual void OnAdd(TileData self) {
+	}
+
 	/// <summary>
 	///		This is extra data appended to the serialized tile data
 	/// </summary>
@@ -30,6 +43,16 @@ public abstract class TileInfo {
 	}
 
 	public virtual void Deserialize(string serialized, TileData data) {
+	}
+
+	/// <summary>
+	/// 	Returns the list of possible editable values for this type
+	/// </summary>
+	public TileDataCustomizationWrapper[] GetCustomData() {
+		return tileDatas.ToArray();
+	}
+
+	public virtual void OnDataUpdate(TileDataCustomizationWrapper changed, TileData self) {
 	}
 
 	public override bool Equals(object obj) {

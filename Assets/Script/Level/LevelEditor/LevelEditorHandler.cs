@@ -78,30 +78,31 @@ public class LevelEditorHandler : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.Q)) {
 			SetSelectedTile(null);
 		}
-		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.S)) {
-			Debug.Log("Saving level: " + LevelIO.LevelDir + level.Name + ".lvl");
-			LevelIO.SaveLevel(level, level.Name);
-			return;
-		}
 
 		// If a gui is open, ignore the editor keys and buttons in the background
 		if (GUIHandler.IsShown()) {
 			return;
 		}
 
-		// Building buttons and keys
+		// Mouse buttons
 		bool left = Input.GetButtonDown("Fire1");
 		bool right = Input.GetButtonDown("Fire2");
-		if (left || right) {
-			if (left) {
-				movingObject.Place(level, this);
-			} else {
-				RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-				if (hit.collider != null) {
-					Vector3 p = hit.collider.gameObject.transform.position;
-					level.RemoveTile(new Vector2(p.x, p.y));
-				}
+
+		// Shift+click to edit data for tile
+		if (Input.GetKey(KeyCode.LeftShift) && left) {
+			TileData data = GetTileHovering();
+			if (data != null) {
+				GuiEditTileData.INSTANCE.tile = data;
+				GUIHandler.ShowGui(GuiEditTileData.INSTANCE);
+				return;
 			}
+		}
+
+		// Building buttons and keys
+		if (left) {
+			movingObject.Place(level, this);
+		} else if (right) {
+			level.RemoveTile(GetTileHovering());
 		}
 
 		// Grid controls
@@ -119,7 +120,7 @@ public class LevelEditorHandler : MonoBehaviour {
 		}
 
 		// If the preview is red, make it green again when the mouse moves (user feedback for error in placing object)
-		if (lastMouse.x != Input.mousePosition.x || lastMouse.y != Input.mousePosition.y) {
+		if (!Mathf.Approximately(lastMouse.x, Input.mousePosition.x) || !Mathf.Approximately(lastMouse.y, Input.mousePosition.y)) {
 			movingObject.ResetErrorColor();
 		}
 
@@ -134,12 +135,21 @@ public class LevelEditorHandler : MonoBehaviour {
 		HoverPos = new Vector2(at.x, at.y);
 	}
 
-	private Vector2 SnapToGrid(Vector2 snap) {
+	Vector2 SnapToGrid(Vector2 snap) {
 		return new Vector2((Mathf.Floor(snap.x / gridSize) + 0.5f) * gridSize, (Mathf.Floor(snap.y / gridSize) + 0.5f) * gridSize);
 	}
 
 	public void SetSelectedTile(TileInfo tile) {
 		movingObject.SetTile(tile);
+	}
+
+	public TileData GetTileHovering() {
+		RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+		if (hit.collider != null) {
+			Vector3 p = hit.collider.gameObject.transform.position;
+			return level.GetTileAt(new Vector2(p.x, p.y));
+		}
+		return null;
 	}
 
 }

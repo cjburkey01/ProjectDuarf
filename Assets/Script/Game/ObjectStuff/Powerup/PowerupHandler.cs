@@ -1,36 +1,51 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class PowerupHandler : MonoBehaviour {
+public static class PowerupHandler {
 
-	readonly Dictionary<PowerUp, float> active = new Dictionary<PowerUp, float>();
+	static readonly Dictionary<PowerUp, float> active = new Dictionary<PowerUp, float>();
 
-	protected void HandlePowerupTick(Player ply) {
+	public static void HandlePowerupTick() {
 		foreach (PowerUp powerup in new List<PowerUp>(active.Keys)) {
-			if (active[powerup] >= powerup.GetLength()) {
-				powerup.OnExpire(ply);
-				active.Remove(powerup);
+			if (active[powerup] >= powerup.length) {
+				RemovePowerup(powerup);
 				continue;
 			}
-			powerup.OnTick(ply);
+			powerup.OnTick(Player.INSTANCE);
 			active[powerup] += Time.deltaTime;
 		}
 	}
 
-	protected void ClearPowerups(Player ply) {
+	public static void ClearPowerups() {
 		foreach (PowerUp powerup in new List<PowerUp>(active.Keys)) {
-			powerup.OnExpire(ply);
-			active.Remove(powerup);
+			RemovePowerup(powerup);
 		}
-		HandlePowerupTick(ply);
 	}
 
-	protected void AddPowerup(Player ply, PowerUp powerUp) {
-		if (powerUp.GetLength() > 0.0f) {
+	public static void AddPowerup(PowerUp powerUp) {
+		if (powerUp.length > 0.0f && !powerUp.GetIsReusable()) {
 			active.Add(powerUp, 0.0f);
+			PowerupListHandler.INSTANCE.AddPowerup(powerUp);
 		}
-		powerUp.OnPickup(ply);
+		powerUp.OnPickup(Player.INSTANCE);
 		Debug.Log("Powerup enabled: " + powerUp.GetUniqueName());
+	}
+
+	public static void RemovePowerup(PowerUp powerUp) {
+		if (powerUp.GetIsReusable()) {
+			return;
+		}
+		powerUp.OnExpire(Player.INSTANCE);
+		active.Remove(powerUp);
+		PowerupListHandler.INSTANCE.RemovePowerup(powerUp);
+		Debug.Log("Powerup disabled: " + powerUp.GetUniqueName());
+	}
+
+	public static float GetTimeForPowerup(PowerUp powerUp) {
+		if (active.ContainsKey(powerUp)) {
+			return active[powerUp];
+		}
+		return -1.0f;
 	}
 
 }
