@@ -66,7 +66,7 @@ public class GuiEditTileData : GameGUI {
 			unsavedChanges.Add(tileData, val.Get());
 			GameObject inst;
 			if (tileData is TileDataBool) {
-				inst = AddBoolOption(displayName, val as SerializableBool);
+				inst = AddBoolOption(tileData, displayName, val as SerializableBool);
 			} else if (tileData is TileDataChoose) {
 				inst = AddChooseOption(displayName, ((TileDataString) val).GetTypedValidValues(), val as SerializableString);
 			} else {
@@ -78,7 +78,7 @@ public class GuiEditTileData : GameGUI {
 		}
 	}
 
-	GameObject AddBoolOption(string displayName, SerializableBool value) {
+	GameObject AddBoolOption(TileDataCustomizationWrapper tileData, string displayName, SerializableBool value) {
 		GameObject inst = Instantiate(optionBoolPrefab, transform, false);
 		if (inst == null) {
 			Debug.LogWarning("Failed to instantiate boolean option prefab");
@@ -91,6 +91,7 @@ public class GuiEditTileData : GameGUI {
 		Toggle toggle = inst.GetComponentInChildren<Toggle>();
 		if (toggle != null) {
 			toggle.isOn = (bool) value.Get();
+			toggle.onValueChanged.AddListener((b) => OnChangedValue(tileData, b.ToString()));
 		}
 		return inst;
 	}

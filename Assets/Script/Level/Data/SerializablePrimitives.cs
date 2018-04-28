@@ -116,7 +116,7 @@ public class SerializableBool : SerializableData {
 	}
 
 	public override void Deserialize(string input) {
-		Set(input.ToLower().Trim() == "true");
+		Set(input != null && (input.ToLower().Trim() == "true"));
 	}
 
 	public override string Serialize() {

@@ -33,7 +33,6 @@ public class Player : MonoBehaviour {
 		PowerUp pu = other.gameObject.GetComponent<PowerUp>();
 		if (pu != null) {
 			PowerupHandler.AddPowerup(pu);
-			Destroy(pu.gameObject);
 		}
 	}
 

@@ -41,11 +41,15 @@ public class GuiMainMenu : GameGUI {
 	}
 
 	public void OnSettingsClick() {
-		
+
 	}
 
 	public void OnQuitClick() {
-		Application.Quit();
+		if (gameHandler.LevelLoaded) {
+			gameHandler.UnloadLevel();
+		} else {
+			Application.Quit();
+		}
 	}
 
 }

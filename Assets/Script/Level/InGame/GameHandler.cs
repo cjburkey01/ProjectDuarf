@@ -52,4 +52,9 @@ public class GameHandler : MonoBehaviour {
 		placeholderCamera.gameObject.SetActive(false);
 	}
 
+	public void UnloadLevel() {
+		GameLevelHandler.INSTANCE.UnloadLevel();
+		placeholderCamera.gameObject.SetActive(true);
+	}
+
 }

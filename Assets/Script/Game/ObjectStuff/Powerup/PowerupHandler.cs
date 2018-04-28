@@ -28,6 +28,10 @@ public static class PowerupHandler {
 			PowerupListHandler.INSTANCE.AddPowerup(powerUp);
 		}
 		powerUp.OnPickup(Player.INSTANCE);
+		if (!powerUp.GetIsReusable()) {
+			//Object.Destroy(powerUp.gameObject);
+			powerUp.gameObject.SetActive(false);
+		}
 		Debug.Log("Powerup enabled: " + powerUp.GetUniqueName());
 	}
 
@@ -38,6 +42,11 @@ public static class PowerupHandler {
 		powerUp.OnExpire(Player.INSTANCE);
 		active.Remove(powerUp);
 		PowerupListHandler.INSTANCE.RemovePowerup(powerUp);
+		if (powerUp.respawns) {
+			powerUp.gameObject.SetActive(true);
+		} else {
+			Object.Destroy(powerUp.gameObject);
+		}
 		Debug.Log("Powerup disabled: " + powerUp.GetUniqueName());
 	}
 

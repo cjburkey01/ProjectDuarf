@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour {
 
 		// Determine how many colliders we intersect that are triggers
 		foreach (BoxCollider2D obj in FindObjectsOfType<BoxCollider2D>()) {
-			if (!obj.bounds.Intersects(plyColl.bounds) || obj.gameObject.layer != 11) {
+			if (!obj.gameObject.activeInHierarchy || !obj.enabled || !obj.bounds.Intersects(plyColl.bounds) || obj.gameObject.layer != 11) {
 				continue;   // Doesn't intersect or isn't a trigger, move on.
 			}
 			foreach (MonoBehaviour mb in GetComponents<MonoBehaviour>()) {

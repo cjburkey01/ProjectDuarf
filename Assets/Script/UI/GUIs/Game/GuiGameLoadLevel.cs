@@ -14,7 +14,7 @@ public class GuiGameLoadLevel : GameGUI, ILevelSelector {
 	public Button buttonExternal;
 	public Button buttonLoad;
 	public Button buttonCancel;
-	
+
 	bool init;
 	string selected;
 
@@ -67,12 +67,12 @@ public class GuiGameLoadLevel : GameGUI, ILevelSelector {
 		}
 	}
 
-	private void Select(Button selected, Button other) {
-		ColorBlock a = selected.colors;
+	private void Select(Button sl, Button other) {
+		ColorBlock a = sl.colors;
 		a.highlightedColor = selectedColor;
 		a.normalColor = selectedColor;
 		a.pressedColor = selectedColor;
-		selected.colors = a;
+		sl.colors = a;
 
 		ColorBlock b = other.colors;
 		b.highlightedColor = defaultColor;
@@ -111,7 +111,7 @@ public class GuiGameLoadLevel : GameGUI, ILevelSelector {
 
 	public void SetSelected(string name) {
 		if (selected != null && selected.Equals(name)) {
-			name = null;	// Deselect
+			name = null;    // Deselect
 		}
 		selected = name;
 		buttonLoad.interactable = name != null;

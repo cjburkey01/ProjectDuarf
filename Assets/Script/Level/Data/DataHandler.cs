@@ -70,6 +70,11 @@ public class DataHandler {
 		return res;
 	}
 
+	public bool GetBool(string key) {
+		string at = Get(key);
+		return at != null && at.ToLower().Trim().Equals("true");
+	}
+
 	public string Get(string key) {
 		string value;
 		if (data.TryGetValue(key, out value)) {

@@ -8,6 +8,10 @@ public class LevelData {
 
 	readonly List<TileData> tiles = new List<TileData>();
 
+	public LevelData() {
+		Name = "";
+	}
+
 	public LevelData(string name) {
 		Name = name;
 	}
@@ -56,10 +60,19 @@ public class LevelData {
 		}
 	}
 
-	public void OnDestroy() {
+	public void OnDestroy(Transform parent) {
 		foreach (TileData tile in tiles) {
 			tile.Tile.OnDestroy(tile);
 		}
+		tiles.Clear();
+		foreach (Transform t in parent) {
+			Object.Destroy(t.gameObject);
+			t.name = "**__==DESTROYED==__**";
+			if (t.GetComponent<PlayerController>() != null) {
+				t.GetComponent<PlayerController>().DoDestroy();
+			}
+		}
+		Debug.Log("Level unloaded");
 	}
 
 	public void RemoveTile(Vector2 position) {
@@ -101,14 +114,7 @@ public class LevelData {
 
 	// One of the ugliest methods I have ever written
 	public void Deserialize(bool init, bool fullColliders, Transform parent, string serialized) {
-		tiles.Clear();
-		foreach (Transform t in parent) {
-			Object.Destroy(t.gameObject);
-			t.name = "**__==DESTROYED==__**";
-			if (t.GetComponent<PlayerController>() != null) {
-				t.GetComponent<PlayerController>().DoDestroy();
-			}
-		}
+		OnDestroy(parent);
 		string[] spl = serialized.Split(new char[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
 		bool loadingName = true;
 		Debug.Log("Loading tiles: " + (spl.Length - 1));

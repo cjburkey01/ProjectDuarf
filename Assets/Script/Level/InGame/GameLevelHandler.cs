@@ -5,33 +5,37 @@ public class GameLevelHandler : MonoBehaviour {
 	public static GameLevelHandler INSTANCE { private set; get; }
 	public bool LevelLoaded { private set; get; }
 
-	private readonly LevelData level = new LevelData("LevelUnknown");
-	private bool hasLevel = false;
+	readonly LevelData level = new LevelData();
+	bool hasLevel;
 
 	public GameLevelHandler() {
 		INSTANCE = this;
 	}
 
 	public void LoadLevel(bool resource, string name) {
-		if (hasLevel) {
-			level.OnDestroy();
-		}
 		if (resource) {
 			Debug.LogError("Tried to load a resource level, but failed");
 			return;
-		} else {
-			LevelLoaded = LevelIO.LoadLevel(true, false, transform, level, name);
 		}
-		hasLevel = true;
+		LevelLoaded = LevelIO.LoadLevel(true, false, transform, level, name);
+		hasLevel = LevelLoaded;
+	}
+
+	public void UnloadLevel() {
+		if (LevelLoaded) {
+			level.OnDestroy(transform);
+			LevelLoaded = false;
+			hasLevel = false;
+		}
 	}
 
 	void Update() {
-		if (!hasLevel) {
+		if (!LevelLoaded) {
 			return;
 		}
-		if (LevelLoaded) {
+		if (hasLevel) {
 			level.OnInit();
-			LevelLoaded = false;
+			hasLevel = false;
 		}
 		level.OnUpdate();
 	}
