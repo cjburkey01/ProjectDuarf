@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour {
 						m2.Invoke(mb, new object[] { obj.gameObject.gameObject.transform });
 					}
 				} catch (Exception e) {
-					Debug.LogError("Error: " + e.Message);
+					Debug.LogWarning(e.Message);
 				}
 			}
 			triggerWith.Add(obj.gameObject.gameObject.name);

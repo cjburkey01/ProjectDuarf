@@ -107,17 +107,17 @@ public class LevelEditorHandler : MonoBehaviour {
 
 		// Grid controls
 		snapToGrid = !Input.GetKey(KeyCode.LeftAlt);
-		if (Input.GetKey(KeyCode.LeftShift)) {
-			if (Input.GetKeyDown(KeyCode.Equals)) {
-				gridSize *= 2.0f;
-			} else if (Input.GetKeyDown(KeyCode.Minus)) {
-				gridSize *= 0.5f;
-			} else {
-				return;
-			}
-			gridSize = Mathf.Clamp(gridSize, gridSizeBounds.x, gridSizeBounds.y);
-			movingObject.UpdateGrid(gridWidth, gridSize);
-		}
+		//if (Input.GetKey(KeyCode.LeftShift)) {
+		//	if (Input.GetKeyDown(KeyCode.Equals)) {
+		//		gridSize *= 2.0f;
+		//	} else if (Input.GetKeyDown(KeyCode.Minus)) {
+		//		gridSize *= 0.5f;
+		//	} else {
+		//		return;
+		//	}
+		//	gridSize = Mathf.Clamp(gridSize, gridSizeBounds.x, gridSizeBounds.y);
+		//	movingObject.UpdateGrid(gridWidth, gridSize);
+		//}
 
 		// If the preview is red, make it green again when the mouse moves (user feedback for error in placing object)
 		if (!Mathf.Approximately(lastMouse.x, Input.mousePosition.x) || !Mathf.Approximately(lastMouse.y, Input.mousePosition.y)) {

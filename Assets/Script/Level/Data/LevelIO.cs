@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+using Service.Support;
 
 [RegisterEventHandlers]
 public static class LevelIO {
@@ -13,6 +15,7 @@ public static class LevelIO {
 	}
 
 	static void InitIO<T>(T e) where T : EventGameInit {
+		e.GetName();
 		LevelDir = Application.persistentDataPath.Replace('\\', '/') + "/Levels/";
 		CreateDir(LevelDir);
 	}
@@ -37,17 +40,13 @@ public static class LevelIO {
 		}
 		string fileName = GetLevelFileFromName(name);
 		Debug.Log("Loading level from file: " + fileName);
-		string file = null;
-		try {
-			file = File.ReadAllText(fileName, System.Text.Encoding.UTF8);
-		} catch (Exception e) {
-			Debug.LogError("Failed to load file: " + e.Message);
-		}
-		if (file == null) {
-			Debug.LogError("Failed to load level file: " + fileName);
+		string decoded = GetDecodedLevelFromPath(fileName);
+		if (string.IsNullOrEmpty(decoded)) {
+			Debug.LogError("Failed to load level from file: " + fileName);
 			return false;
 		}
-		LoadLevelFromString(init, fullColliders, levelParent, level, file);
+
+		LoadLevelFromString(init, fullColliders, levelParent, level, decoded.Trim());
 		return true;
 	}
 
@@ -80,7 +79,7 @@ public static class LevelIO {
 			return false;
 		}
 		Debug.Log("Saving: " + CreateLevelPath(name));
-		File.WriteAllText(CreateLevelPath(name), level.Serialize(), System.Text.Encoding.UTF8);
+		File.WriteAllText(CreateLevelPath(name), "encode" + Encoding.UTF8.ToBase64(level.Serialize()), Encoding.UTF8); // Saves in Base64 (UTF-8)
 		return true;
 	}
 
@@ -131,15 +130,40 @@ public static class LevelIO {
 		if (!path.EndsWith(".lvl", StringComparison.Ordinal)) {
 			return null;
 		}
-		string inf = File.ReadAllText(path);
-		if (inf == null) {
+		string level = GetDecodedLevelFromPath(path);
+		if (string.IsNullOrEmpty(level)) {
 			return null;
 		}
-		string[] txt = inf.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-		if (txt.Length < 1) {
+		string[] spl = level.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+		if (spl.Length < 1) {
 			return null;
 		}
-		return txt[0];
+		return spl[0];
+	}
+
+	static string ReadFile(string path) {
+		string file = null;
+		try {
+			file = File.ReadAllText(path, Encoding.UTF8);
+		} catch (Exception e) {
+			Debug.LogError("Failed to load file: " + e.Message);
+		}
+		return file;
+	}
+
+	static string GetDecodedLevelFromPath(string path) {
+		string decoded = ReadFile(path);
+		if (decoded == null) {
+			return null;
+		}
+		// Levels can be stored in Base64 (UTF-8), so parse them if they are
+		if (decoded.StartsWith("encode", StringComparison.OrdinalIgnoreCase)) {
+			if (!Encoding.UTF8.TryParseBase64(decoded.Substring("encode".Length), out decoded)) {
+				Debug.LogError("Failed to load level file. Unable to parse base64");
+				return null;
+			}
+		}
+		return decoded;
 	}
 
 }
