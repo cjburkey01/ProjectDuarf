@@ -8,20 +8,19 @@ public class LevelData {
 
 	readonly List<TileData> tiles = new List<TileData>();
 
-	public LevelData() {
-		Name = "";
+	public LevelData() : this("") {
 	}
 
 	public LevelData(string name) {
 		Name = name;
 	}
 
-	public bool AddTile(bool init, Transform parent, Vector2 position, float z, TileInfo tile) {
+	public bool AddTile(Vector2 position, float z, TileInfo tile) {
 		TileData n;
-		return AddTile(init, parent, position, z, tile, out n);
+		return AddTile(position, z, tile, out n);
 	}
 
-	public bool AddTile(bool init, Transform parent, Vector2 position, float z, TileInfo tile, out TileData tDone) {
+	public bool AddTile(Vector2 position, float z, TileInfo tile, out TileData tDone) {
 		tDone = null;
 		TileData at = GetTileAt(position);
 		if (at != null) {
@@ -30,22 +29,30 @@ public class LevelData {
 			}
 			z = at.Z - 0.1f;
 		}
-		TileData tileD = new TileData(position, z, tile);
-		if (InstantiateTile(init, parent, tileD) != null) {
-			tiles.Add(tileD);
-			tDone = tileD;
-			return true;
-		}
-		return false;
+		tDone = new TileData(position, z, tile);
+		AddTile(tDone);
+		return true;
 	}
 
-	public bool AddTile(bool init, Transform parent, TileData tile) {
-		if (InstantiateTile(init, parent, tile) != null) {
+	public void AddTile(TileData tile) {
+		if (!tiles.Contains(tile)) {
 			tiles.Add(tile);
-			tile.Tile.OnAdd(tile);
-			return true;
 		}
-		return false;
+	}
+
+	public void InstantiateLevel(bool init, bool fullColliders, Transform parent) {
+		foreach (TileData tile in tiles) {
+			InstantiateTile(init, parent, tile);
+			if (fullColliders) {
+				BoxCollider2D c = tile.Instantiated.GetComponent<BoxCollider2D>();
+				if (c == null) {
+					c = tile.Instantiated.AddComponent<BoxCollider2D>();
+				}
+				c.offset = new Vector2(0.0f, 0.0f);
+				c.size = new Vector2(1.0f, 1.0f);
+			}
+		}
+		Debug.Log("Instantiated level");
 	}
 
 	public void OnInit() {
@@ -105,17 +112,16 @@ public class LevelData {
 	}
 
 	public string Serialize() {
-		string data = Name + "\n";
+		string data = Name + ";";
 		foreach (TileData tile in tiles) {
-			data += tile.Serialize() + "\n";
+			data += tile.Serialize() + ";";
 		}
 		return data;
 	}
 
-	// One of the ugliest methods I have ever written
 	public void Deserialize(bool init, bool fullColliders, Transform parent, string serialized) {
 		OnDestroy(parent);
-		string[] spl = serialized.Split(new char[] { '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+		string[] spl = serialized.Split(new char[] { '\n', ';' }, System.StringSplitOptions.RemoveEmptyEntries);
 		bool loadingName = true;
 		Debug.Log("Loading tiles: " + (spl.Length - 1));
 		foreach (string tile in spl) {
@@ -126,25 +132,16 @@ public class LevelData {
 			}
 			TileData t = TileData.Deserialize(tile);
 			if (t != null) {
-				if (!AddTile(init, parent, t)) {
-					Debug.LogError("Failed to add tile: " + tile);
-				}
-				if (fullColliders) {
-					BoxCollider2D c = t.Instantiated.GetComponent<BoxCollider2D>();
-					if (c == null) {
-						c = t.Instantiated.AddComponent<BoxCollider2D>();
-					}
-					c.offset = new Vector2(0.0f, 0.0f);
-					c.size = new Vector2(1.0f, 1.0f);
-				}
+				AddTile(t);
 			} else {
 				Debug.LogError("Failed to deserialize tile: " + tile);
 			}
 		}
 		Debug.Log("Loaded " + tiles.Count + " tiles");
+		InstantiateLevel(init, fullColliders, parent);
 	}
 
-	public static GameObject InstantiateTile(bool init, Transform parent, TileData data) {
+	public GameObject InstantiateTile(bool init, Transform parent, TileData data) {
 		GameObject instance = null;
 		if (data.Tile.DoCustomInstantiation(init, data.Position, data.Z, data, out instance)) {
 			if (ReferenceEquals(instance, null)) {
@@ -162,6 +159,9 @@ public class LevelData {
 			instance = Object.Instantiate(prefab, new Vector3(data.Position.x, data.Position.y, data.Z), Quaternion.identity, parent);
 			instance.name = data.Tile.GetResourceName() + " (" + data.Position.x + ", " + data.Position.y + ")";
 			data.SetInstantiated(instance);
+		}
+		if (instance != null) {
+			data.Tile.OnAdd(data);
 		}
 		return instance;
 	}

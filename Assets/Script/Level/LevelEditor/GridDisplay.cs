@@ -70,7 +70,7 @@ public class GridDisplay : MonoBehaviour {
 		}
 	}
 
-	public void SetTile(TileInfo tile) {
+	public void SetTile(LevelData data, TileInfo tile) {
 		this.tile = tile;
 		if (selected != null) {
 			Destroy(selected);
@@ -78,7 +78,7 @@ public class GridDisplay : MonoBehaviour {
 		if (tile == null) {
 			return;
 		}
-		selected = LevelData.InstantiateTile(false, transform, new TileData(Vector2.zero, 0.0f, tile));
+		selected = data.InstantiateTile(false, transform, new TileData(Vector2.zero, 0.0f, tile));
 		if (selected == null) {
 			return;
 		}
@@ -97,10 +97,11 @@ public class GridDisplay : MonoBehaviour {
 	public void Place(Vector2 pos, LevelData data, LevelEditorHandler leh) {
 		if (tile != null) {
 			TileData dat;
-			if (!data.AddTile(false, leh.transform, pos, transform.position.z, tile, out dat)) {
+			if (!data.AddTile(pos, transform.position.z, tile, out dat)) {
 				MarkErrorColor();
 				return;
 			}
+			data.InstantiateTile(false, leh.transform, dat);
 			BoxCollider2D c = dat.Instantiated.GetComponent<BoxCollider2D>();
 			if (c == null) {
 				c = dat.Instantiated.AddComponent<BoxCollider2D>();

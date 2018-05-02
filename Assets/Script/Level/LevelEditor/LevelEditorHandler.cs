@@ -140,7 +140,7 @@ public class LevelEditorHandler : MonoBehaviour {
 	}
 
 	public void SetSelectedTile(TileInfo tile) {
-		movingObject.SetTile(tile);
+		movingObject.SetTile(level, tile);
 	}
 
 	public TileData GetTileHovering() {

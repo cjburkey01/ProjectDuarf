@@ -45,7 +45,6 @@ public static class LevelIO {
 			Debug.LogError("Failed to load level from file: " + fileName);
 			return false;
 		}
-
 		LoadLevelFromString(init, fullColliders, levelParent, level, decoded.Trim());
 		return true;
 	}
@@ -127,14 +126,11 @@ public static class LevelIO {
 	}
 
 	static string GetLevelNameFromPath(string path) {
-		if (!path.EndsWith(".lvl", StringComparison.Ordinal)) {
-			return null;
-		}
 		string level = GetDecodedLevelFromPath(path);
 		if (string.IsNullOrEmpty(level)) {
 			return null;
 		}
-		string[] spl = level.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+		string[] spl = level.Split(new char[] { '\n', ';' }, StringSplitOptions.RemoveEmptyEntries);
 		if (spl.Length < 1) {
 			return null;
 		}
@@ -152,6 +148,9 @@ public static class LevelIO {
 	}
 
 	static string GetDecodedLevelFromPath(string path) {
+		if (!path.EndsWith(".lvl", StringComparison.Ordinal)) {
+			return null;
+		}
 		string decoded = ReadFile(path);
 		if (decoded == null) {
 			return null;
