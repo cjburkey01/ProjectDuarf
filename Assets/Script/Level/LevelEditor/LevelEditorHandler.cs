@@ -31,7 +31,8 @@ public class LevelEditorHandler : MonoBehaviour {
 	}
 
 	public void LoadLevel(string name) {
-		LevelLoaded = LevelIO.LoadLevel(false, true, transform, level, name);
+		LevelLoaded = LevelIO.LoadLevel(level, name);
+		level.InstantiateLevel(false, true, transform);
 		if (!LevelLoaded) {
 			Debug.Log("Could not load level from level editor handler: " + name);
 		}

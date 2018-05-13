@@ -17,13 +17,14 @@ public class GameLevelHandler : MonoBehaviour {
 			Debug.LogError("Tried to load a resource level, but failed");
 			return;
 		}
-		LevelLoaded = LevelIO.LoadLevel(true, false, transform, level, name);
+		LevelLoaded = LevelIO.LoadLevel(level, name);
+		level.InstantiateLevel(true, false, transform);
 		hasLevel = LevelLoaded;
 	}
 
 	public void UnloadLevel() {
 		if (LevelLoaded) {
-			level.OnDestroy(transform);
+			level.ClearWorld(transform);
 			LevelLoaded = false;
 			hasLevel = false;
 		}

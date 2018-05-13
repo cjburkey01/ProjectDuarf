@@ -41,6 +41,7 @@ public class LevelData {
 	}
 
 	public void InstantiateLevel(bool init, bool fullColliders, Transform parent) {
+		ClearWorld(parent);
 		foreach (TileData tile in tiles) {
 			InstantiateTile(init, parent, tile);
 			if (fullColliders) {
@@ -67,11 +68,14 @@ public class LevelData {
 		}
 	}
 
-	public void OnDestroy(Transform parent) {
+	public void ClearData() {
 		foreach (TileData tile in tiles) {
 			tile.Tile.OnDestroy(tile);
 		}
 		tiles.Clear();
+	}
+
+	public void ClearWorld(Transform parent) {
 		foreach (Transform t in parent) {
 			Object.Destroy(t.gameObject);
 			t.name = "**__==DESTROYED==__**";
@@ -79,7 +83,6 @@ public class LevelData {
 				t.GetComponent<PlayerController>().DoDestroy();
 			}
 		}
-		Debug.Log("Level unloaded");
 	}
 
 	public void RemoveTile(Vector2 position) {
@@ -119,8 +122,7 @@ public class LevelData {
 		return data;
 	}
 
-	public void Deserialize(bool init, bool fullColliders, Transform parent, string serialized) {
-		OnDestroy(parent);
+	public void Deserialize(string serialized) {
 		string[] spl = serialized.Split(new char[] { '\n', ';' }, System.StringSplitOptions.RemoveEmptyEntries);
 		bool loadingName = true;
 		Debug.Log("Loading tiles: " + (spl.Length - 1));
@@ -138,7 +140,6 @@ public class LevelData {
 			}
 		}
 		Debug.Log("Loaded " + tiles.Count + " tiles");
-		InstantiateLevel(init, fullColliders, parent);
 	}
 
 	public GameObject InstantiateTile(bool init, Transform parent, TileData data) {

@@ -53,6 +53,7 @@ public class GameHandler : MonoBehaviour {
 	}
 
 	public void UnloadLevel() {
+		PowerupHandler.ClearPowerups();
 		GameLevelHandler.INSTANCE.UnloadLevel();
 		placeholderCamera.gameObject.SetActive(true);
 	}

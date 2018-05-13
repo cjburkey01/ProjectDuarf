@@ -21,7 +21,11 @@ public static class LevelIO {
 	}
 
 	static string CreateLevelPath(string name) {
-		return LevelDir + name + ".lvl";
+		string lvl = GetLevelFileFromName(name);
+		if (!string.IsNullOrEmpty(lvl)) {
+			return lvl;
+		}
+		return LevelDir + MD5Util.Hash(name) + ".lvl";
 	}
 
 	static void CreateDir(string dir) {
@@ -30,7 +34,7 @@ public static class LevelIO {
 		}
 	}
 
-	static bool LoadLevelFromFile(bool init, bool fullColliders, Transform levelParent, LevelData level, string name) {
+	static bool LoadLevelFromFile(LevelData level, string name) {
 		if (name.EndsWith(".lvl", StringComparison.Ordinal)) {
 			name.Substring(0, name.Length - 4);
 		}
@@ -45,12 +49,12 @@ public static class LevelIO {
 			Debug.LogError("Failed to load level from file: " + fileName);
 			return false;
 		}
-		LoadLevelFromString(init, fullColliders, levelParent, level, decoded.Trim());
+		LoadLevelFromString(level, decoded.Trim());
 		return true;
 	}
 
-	static void LoadLevelFromString(bool init, bool fullColliders, Transform levelParent, LevelData level, string serialized) {
-		level.Deserialize(init, fullColliders, levelParent, serialized);
+	static void LoadLevelFromString(LevelData level, string serialized) {
+		level.Deserialize(serialized);
 		Debug.Log("Deserialized level");
 	}
 
@@ -68,8 +72,8 @@ public static class LevelIO {
 		return false;
 	}
 
-	public static bool LoadLevel(bool init, bool fullColliders, Transform levelParent, LevelData level, string levelName) {
-		return LoadLevelFromFile(init, fullColliders, levelParent, level, levelName);
+	public static bool LoadLevel(LevelData level, string levelName) {
+		return LoadLevelFromFile(level, levelName);
 	}
 
 	public static bool SaveLevel(LevelData level, string name) {
@@ -77,8 +81,9 @@ public static class LevelIO {
 			Debug.LogError("Invalid level name: " + name);
 			return false;
 		}
-		Debug.Log("Saving: " + CreateLevelPath(name));
-		File.WriteAllText(CreateLevelPath(name), "encode" + Encoding.UTF8.ToBase64(level.Serialize()), Encoding.UTF8); // Saves in Base64 (UTF-8)
+		string path = CreateLevelPath(name);
+		Debug.Log("Saving: " + path);
+		File.WriteAllText(path, "encode" + Encoding.UTF8.ToBase64(level.Serialize()), Encoding.UTF8); // Saves in Base64 (UTF-8)
 		return true;
 	}
 
