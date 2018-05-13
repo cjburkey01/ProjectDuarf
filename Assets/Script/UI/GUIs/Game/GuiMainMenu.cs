@@ -33,7 +33,7 @@ public class GuiMainMenu : GameGUI {
 	}
 
 	public void OnPlayClick() {
-		GUIHandler.ShowGui(GuiGameLoadLevel.INSTANCE);
+		GUIHandler.ShowGui(GuiPickPack.INSTANCE);
 	}
 
 	public void OnEditClick() {

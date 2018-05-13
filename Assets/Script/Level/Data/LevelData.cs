@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LevelData {
 
+	public LevelPack LevelPack { private set; get; }
 	public string Name { private set; get; }
 
 	readonly List<TileData> tiles = new List<TileData>();
@@ -11,7 +12,14 @@ public class LevelData {
 	public LevelData() : this("") {
 	}
 
-	public LevelData(string name) {
+	public LevelData(LevelPack levelPack) : this(levelPack, "") {
+	}
+
+	public LevelData(string name) : this(null, name) {
+	}
+
+	public LevelData(LevelPack levelPack, string name) {
+		LevelPack = levelPack;
 		Name = name;
 	}
 

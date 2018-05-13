@@ -5,7 +5,7 @@ public class LevelEditorHandler : MonoBehaviour {
 	public static LevelEditorHandler INSTANCE { private set; get; }
 
 	public GridDisplay movingObject;
-	public LevelData level = new LevelData("LevelTest");
+	public LevelData LoadedLevel { private set; get; }
 	public float gridSize = 1.0f;
 	public int gridWidth = 3;
 	public Vector2 gridSizeBounds = new Vector2(0.25f, 4.0f);
@@ -24,22 +24,23 @@ public class LevelEditorHandler : MonoBehaviour {
 			Debug.LogError("Level already exists: " + name);
 			return false;
 		}
-		level = new LevelData(name);
+		LoadedLevel = new LevelData(name);
 		SaveLevel();
 		LevelLoaded = true;
 		return true;
 	}
 
 	public void LoadLevel(string name) {
-		LevelLoaded = LevelIO.LoadLevel(level, name);
-		level.InstantiateLevel(false, true, transform);
+		LoadedLevel = LevelIO.LoadLevel(name);
+		LevelLoaded = LoadedLevel != null;
+		LoadedLevel.InstantiateLevel(false, true, transform);
 		if (!LevelLoaded) {
 			Debug.Log("Could not load level from level editor handler: " + name);
 		}
 	}
 
 	public void SaveLevel() {
-		LevelIO.SaveLevel(level, level.Name);
+		LevelIO.SaveLevel(LoadedLevel, LoadedLevel.Name);
 	}
 
 	void Start() {
@@ -101,9 +102,9 @@ public class LevelEditorHandler : MonoBehaviour {
 
 		// Building buttons and keys
 		if (left) {
-			movingObject.Place(level, this);
+			movingObject.Place(LoadedLevel, this);
 		} else if (right) {
-			level.RemoveTile(GetTileHovering());
+			LoadedLevel.RemoveTile(GetTileHovering());
 		}
 
 		// Grid controls
@@ -141,14 +142,14 @@ public class LevelEditorHandler : MonoBehaviour {
 	}
 
 	public void SetSelectedTile(TileInfo tile) {
-		movingObject.SetTile(level, tile);
+		movingObject.SetTile(LoadedLevel, tile);
 	}
 
 	public TileData GetTileHovering() {
 		RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
 		if (hit.collider != null) {
 			Vector3 p = hit.collider.gameObject.transform.position;
-			return level.GetTileAt(new Vector2(p.x, p.y));
+			return LoadedLevel.GetTileAt(new Vector2(p.x, p.y));
 		}
 		return null;
 	}
