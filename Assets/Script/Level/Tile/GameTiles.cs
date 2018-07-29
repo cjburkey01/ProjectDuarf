@@ -36,6 +36,11 @@ public static class GameTiles {
 
 	// Creates the types of tiles used in the game
 	static void Init<T>(T e) where T : EventGameInit {
+        if (HasInit) {
+            return;
+        }
+        HasInit = true;
+
 		tilePlaceholderPlayer = Tiles.RegisterTile(new TilePlaceholder("Prefab/Game/Player", "PlaceholderPlayer", "Tile/Placeholder/Player", true));
 
 		tilePowerupDoubleJump = Tiles.RegisterTile(new TilePowerup("Prefab/Powerup/DoubleJump", "PUDoubleJump", "Tile/Placeholder/PowerUp/DoubleJump"));

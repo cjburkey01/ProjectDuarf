@@ -18,7 +18,7 @@ public static class NewBehaviourScript {
 		if (File.Exists(externalFilepath)) {
 			data = File.ReadAllBytes(externalFilepath);
 			texture = new Texture2D(2, 2);
-			if (texture.LoadImage(data)) {
+            if (texture.LoadImage(data)) {
 				return texture;
 			}
 		}
