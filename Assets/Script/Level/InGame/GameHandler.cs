@@ -38,6 +38,7 @@ public class GameHandler : MonoBehaviour {
 		IsPaused = GUIHandler.IsShown();
 	}
 
+    [System.Obsolete]
 	public void LoadLevel(bool resource, string name) {
 		placeholderCamera.gameObject.SetActive(true);
 		GameLevelHandler.INSTANCE.LoadLevel(resource, name);
@@ -51,6 +52,20 @@ public class GameHandler : MonoBehaviour {
 		InGame = true;
 		placeholderCamera.gameObject.SetActive(false);
 	}
+
+    public void LoadLevel(LevelData level) {
+        placeholderCamera.gameObject.SetActive(true);
+        GameLevelHandler.INSTANCE.LoadLevel(level);
+		PlayerController f = FindObjectOfType<PlayerController>();
+		if (f == null || f.Destroyed) {
+			Debug.LogError("Failed to locate player, this level cannot be played");
+			GUIHandler.ShowGui(GuiMainMenu.INSTANCE);
+			return;
+		}
+		GUIHandler.HideGui();
+		InGame = true;
+		placeholderCamera.gameObject.SetActive(false);
+    }
 
 	public void UnloadLevel() {
 		PowerupHandler.ClearPowerups();

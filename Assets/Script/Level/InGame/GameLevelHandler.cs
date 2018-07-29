@@ -12,6 +12,7 @@ public class GameLevelHandler : MonoBehaviour {
 		INSTANCE = this;
 	}
 
+    [System.Obsolete]
 	public void LoadLevel(bool resource, string name) {
 		if (resource) {
 			Debug.LogError("Tried to load a resource level, but failed");
@@ -19,8 +20,16 @@ public class GameLevelHandler : MonoBehaviour {
 		}
 		LoadedLevel = LevelIO.LoadLevel(name);
 		LoadedLevel.InstantiateLevel(true, false, transform);
-		hasLevel = LevelLoaded;
+        LevelLoaded = true;
+		hasLevel = true;
 	}
+
+    public void LoadLevel(LevelData level) {
+        LoadedLevel = level;
+        LoadedLevel.InstantiateLevel(true, false, transform);
+        LevelLoaded = true;
+		hasLevel = true;
+    }
 
 	public void UnloadLevel() {
 		if (LevelLoaded) {

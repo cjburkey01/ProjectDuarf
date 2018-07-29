@@ -33,6 +33,7 @@ public class GuiMainMenu : GameGUI {
 	}
 
 	public void OnPlayClick() {
+        GuiPickPack.INSTANCE.OnCall = OnLevelLoad;
 		GUIHandler.ShowGui(GuiPickPack.INSTANCE);
 	}
 
@@ -51,5 +52,9 @@ public class GuiMainMenu : GameGUI {
 			Application.Quit();
 		}
 	}
+
+    private void OnLevelLoad(LevelData level) {
+        gameHandler.LoadLevel(level);
+    }
 
 }

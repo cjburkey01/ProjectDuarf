@@ -126,7 +126,7 @@ public class GuiPickPack : GameGUI {
 
 	void OnSelectClick() {
 		if (buttonSelect.interactable) {
-			Debug.Log("load level pack: " + selectedPack.name);
+			Debug.Log("Loading level pack: " + selectedPack.name);
 			GuiPickLevel.INSTANCE.levels = selectedPack.GetLevels();
 			GuiPickLevel.INSTANCE.OnCall = OnCall;
 			GUIHandler.ShowGui(GuiPickLevel.INSTANCE);

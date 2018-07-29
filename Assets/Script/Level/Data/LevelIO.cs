@@ -53,8 +53,7 @@ public static class LevelIO {
 		}
 		return LoadLevelFromString(decoded.Trim());
 	}
-
-	[Obsolete]
+    
 	static LevelData LoadLevelFromString(string serialized) {
 		LevelData level = new LevelData();
 		level.Deserialize(serialized);
