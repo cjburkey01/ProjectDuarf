@@ -9,14 +9,14 @@ public class LevelData {
 
 	readonly List<TileData> tiles = new List<TileData>();
 
-	public LevelData() : this("") {
-	}
+	//public LevelData() : this("") {
+	//}
 
-	public LevelData(LevelPack levelPack) : this(levelPack, "") {
-	}
+	//public LevelData(LevelPack levelPack) : this(levelPack, "") {
+	//}
 
-	public LevelData(string name) : this(null, name) {
-	}
+	//public LevelData(string name) : this(null, name) {
+	//}
 
 	public LevelData(LevelPack levelPack, string name) {
 		LevelPack = levelPack;

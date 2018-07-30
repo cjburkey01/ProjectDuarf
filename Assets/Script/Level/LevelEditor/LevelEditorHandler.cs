@@ -12,35 +12,44 @@ public class LevelEditorHandler : MonoBehaviour {
 	public Vector2 HoverPos { private set; get; }
 	public bool LevelLoaded { private set; get; }
 
-	private bool snapToGrid;
-	private Vector2 lastMouse;
+	bool snapToGrid;
+	Vector2 lastMouse;
 
 	public LevelEditorHandler() {
 		INSTANCE = this;
 	}
 
-	public bool NewLevel(string name) {
-		if (LevelIO.GetLevelExists(name)) {
+	public bool NewLevel(LevelPack levelPack, string name) {
+		if (levelPack.HasLevel(name)) {
 			Debug.LogError("Level already exists: " + name);
 			return false;
 		}
-		LoadedLevel = new LevelData(name);
+		LoadedLevel = new LevelData(levelPack, name);
 		SaveLevel();
-		LevelLoaded = true;
+		LoadLevel(LoadedLevel);
 		return true;
 	}
 
-	public void LoadLevel(string name) {
-		LoadedLevel = LevelIO.LoadLevel(name);
-		LevelLoaded = LoadedLevel != null;
-		LoadedLevel.InstantiateLevel(false, true, transform);
-		if (!LevelLoaded) {
-			Debug.Log("Could not load level from level editor handler: " + name);
+	[System.Obsolete]
+	public void LoadLevel(string name, bool val) {
+		LoadLevel(LevelIO.LoadLevel(name));
+	}
+
+	public void LoadLevel(LevelData level) {
+		LevelLoaded = level != null;
+		if (level != null) {
+			level.InstantiateLevel(false, true, transform);
+			if (!LevelLoaded) {
+				Debug.Log("Could not load level from level editor handler: " + level.Name);
+			}
+		} else {
+			LoadedLevel.ClearWorld(transform);
 		}
+		LoadedLevel = level;
 	}
 
 	public void SaveLevel() {
-		LevelIO.SaveLevel(LoadedLevel, LoadedLevel.Name);
+		LevelIO.SaveLevel(LoadedLevel);
 	}
 
 	void Start() {

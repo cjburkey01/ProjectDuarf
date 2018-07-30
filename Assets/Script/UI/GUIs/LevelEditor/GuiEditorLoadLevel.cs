@@ -11,25 +11,27 @@ public class GuiEditorLoadLevel : GameGUI, ILevelSelector {
 	public Color selectedColor = new Color(0.11f, 0.835f, 0.125f, 0.847f);
 	public LevelEditorHandler levelEditorHandler;
 	public Button buttonLoad;
+	public Button buttonDelete;
+	public Button buttonNew;
 	public Button buttonCancel;
-	
-	private bool init = false;
-	private string selected = null;
+	public LevelPack levelPack;
+
+	LevelData selected;
 
 	public GuiEditorLoadLevel() {
 		INSTANCE = this;
 	}
 
 	public override string GetUniqueName() {
-		return "GuiEditorLoadLevel";
+		return "GuiEditorLoadLevelFromPack";
 	}
 
 	public override void OnShow(GameGUI previousGui) {
-		if (!init) {
-			init = true;
-			buttonLoad.onClick.AddListener(OnLoadClick);
-			buttonCancel.onClick.AddListener(OnCancelClick);
-		}
+		buttonLoad.onClick.AddListener(OnLoadClick);
+		buttonDelete.onClick.AddListener(OnDeleteClick);
+		buttonNew.onClick.AddListener(OnNewClick);
+		buttonCancel.onClick.AddListener(OnCancelClick);
+
 		Replace();
 	}
 
@@ -37,21 +39,23 @@ public class GuiEditorLoadLevel : GameGUI, ILevelSelector {
 		Clear();
 	}
 
-	private void Clear() {
+	void Clear() {
 		foreach (Transform t in container.transform) {
 			Destroy(t.gameObject);
 		}
 	}
 
 	public void Replace() {
-		foreach (string level in LevelIO.GetLevels(false)) {
+		Clear();
+
+		foreach (LevelData level in levelPack.GetLevels()) {
 			GameObject obj = Instantiate(levelDisplayPrefab, container.transform, false);
 			LevelDisplay ld = obj.GetComponent<LevelDisplay>();
 			ld.levelLoader = this;
-			ld.SetLevelName(level);
+			ld.SetLevelName(level.Name);
 		}
-		SetSelected(null);
-		buttonLoad.interactable = false;
+
+		Select(null);
 	}
 
 	public void OnLoadClick() {
@@ -62,32 +66,58 @@ public class GuiEditorLoadLevel : GameGUI, ILevelSelector {
 		if (levelEditorHandler.LevelLoaded) {
 			GUIHandler.HideGui();
 		} else {
-			Clear();
 			Replace();
 		}
 	}
 
-	public void OnCancelClick() {
-		init = false;
-		buttonLoad.onClick.RemoveAllListeners();
-		buttonCancel.onClick.RemoveAllListeners();
-		GUIHandler.ShowGui(GuiEditorMenu.INSTANCE);
+	public void OnDeleteClick() {
+		
 	}
 
-	public void SetSelected(string name) {
-		if (selected != null && selected.Equals(name)) {
-			name = null;	// Deselect
+	public void OnNewClick() {
+		GuiEditorNewLevel.INSTANCE.levelPack = levelPack;
+		GUIHandler.ShowGui(GuiEditorNewLevel.INSTANCE);
+	}
+
+	public void OnCancelClick() {
+		buttonLoad.onClick.RemoveAllListeners();
+		buttonCancel.onClick.RemoveAllListeners();
+
+		GUIHandler.ShowGui(GuiEditorPackList.INSTANCE);
+	}
+
+	public void Select(LevelData level) {
+		if (selected != null && selected.Equals(level)) {
+			Select(null);   // Deselect
+			return;
 		}
-		selected = name;
-		buttonLoad.interactable = name != null;
+
+		selected = level;
+
+		buttonLoad.interactable = (selected != null);
+		buttonDelete.interactable = (selected != null);
+		
 		foreach (Transform t in container.transform) {
 			Image img = t.GetComponent<Image>();
-			if (t.GetComponent<LevelDisplay>().LevelName.Equals(name)) {
+			if (selected != null && t.GetComponent<LevelDisplay>().LevelName.Equals(selected.Name)) {	// TODO: AVOID USING NAMES TO COMPARE
 				img.color = selectedColor;
 			} else {
 				img.color = defaultColor;
 			}
 		}
+	}
+
+	public void SetSelected(string name) {
+		if (name == null) {
+			Select(null);
+		}
+		foreach (LevelData level in levelPack.GetLevels()) {
+			if (level.Name.Equals(name)) {
+				Select(level);
+				return;
+			}
+		}
+		Select(null);
 	}
 
 }

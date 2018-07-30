@@ -6,6 +6,7 @@ public class GuiEditorMenu : GameGUI {
 	public static GuiEditorMenu INSTANCE { private set; get; }
 
 	public LevelEditorHandler levelEditorHandler;
+	public Button buttonLevels;
 	public Button buttonNew;
 	public Button buttonLoad;
 	public Button buttonSave;
@@ -25,6 +26,7 @@ public class GuiEditorMenu : GameGUI {
 	public override void OnShow(GameGUI previousGui) {
 		if (!init) {
 			init = true;
+			buttonLevels.onClick.AddListener(OnLevelsClick);
 			buttonNew.onClick.AddListener(OnNewClick);
 			buttonLoad.onClick.AddListener(OnLoadClick);
 			buttonSave.onClick.AddListener(OnSaveClick);
@@ -65,7 +67,17 @@ public class GuiEditorMenu : GameGUI {
 	}
 
 	public void OnNoSaveExitClick() {
-		SceneManager.LoadScene(0);
+		if (levelEditorHandler.LevelLoaded) {
+			GuiEditorLoadLevel.INSTANCE.levelPack = levelEditorHandler.LoadedLevel.LevelPack;
+			levelEditorHandler.LoadLevel(null);
+			GUIHandler.ShowGui(GuiEditorLoadLevel.INSTANCE);
+		} else {
+			SceneManager.LoadScene(0);
+		}
+	}
+
+	public void OnLevelsClick() {
+		GUIHandler.ShowGui(GuiEditorPackList.INSTANCE);
 	}
 
 }

@@ -29,9 +29,6 @@ public class PDEventHandler<T> where T : PDEvent {
 				continue;
 			}
 			listener.Invoke(e);
-			if (e.IsCancellable() && e.IsCancelled()) {
-				return;
-			}
 		}
 	}
 

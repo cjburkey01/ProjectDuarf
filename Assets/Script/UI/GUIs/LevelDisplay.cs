@@ -26,11 +26,6 @@ public class LevelDisplay : MonoBehaviour {
 	public void OnClick() {
 		levelLoader.SetSelected(LevelName);
 	}
-
-	public void OnDelete() {
-		GuiConfirmDelete.INSTANCE.levelName = LevelName;
-		GUIHandler.ShowGui(GuiConfirmDelete.INSTANCE);
-	}
 	
 }
 

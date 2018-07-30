@@ -1,14 +1,17 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class LevelPack {
 
+	public readonly string path;
 	public readonly string name;
 	public readonly string version;
 	readonly Dictionary<string, LevelData> levels = new Dictionary<string, LevelData>();
 
-	public LevelPack(string name, string version) {
+	public LevelPack(string path, string name, string version) {
+		this.path = path;
 		this.name = name;
 		this.version = version;
 	}
@@ -40,6 +43,10 @@ public class LevelPack {
 
 	public LevelData[] GetLevels() {
 		return levels.Values.ToArray();
+	}
+
+	public bool HasLevel(string name) {
+		return levels.ContainsKey(name);
 	}
 
 	public override bool Equals(object obj) {

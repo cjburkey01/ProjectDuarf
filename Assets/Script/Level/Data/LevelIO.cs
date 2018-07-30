@@ -5,28 +5,33 @@ using System.Text;
 using UnityEngine;
 using Service.Support;
 
-[RegisterEventHandlers]
 public static class LevelIO {
 
 	public static string LevelDir { private set; get; }
 
-	static void RegisterEvents() {
-		EventObject.EventSystem.AddListener<EventGameInit>(InitIO);
-	}
+	static bool init;
 
-	static void InitIO<T>(T e) where T : EventGameInit {
-		e.GetName();
+	static void InitIO() {
+		if (init) {
+			return;
+		}
+		init = true;
 		LevelDir = Application.persistentDataPath.Replace('\\', '/') + "/Levels/";
 		CreateDir(LevelDir);
 	}
 
 	[Obsolete]
 	static string CreateLevelPath(string name) {
+		InitIO();
 		string lvl = GetLevelFileFromName(name);
 		if (!string.IsNullOrEmpty(lvl)) {
 			return lvl;
 		}
 		return LevelDir + MD5Util.Hash(name) + ".lvl";
+	}
+
+	static string CreateLevelPath(LevelData level) {
+		return level.LevelPack.path + "/Levels/" + MD5Util.Hash(level.Name) + ".lvl";
 	}
 
 	static void CreateDir(string dir) {
@@ -51,11 +56,11 @@ public static class LevelIO {
 			Debug.LogError("Failed to load level from file: " + fileName);
 			return null;
 		}
-		return LoadLevelFromString(decoded.Trim());
+		return LoadLevelFromString(null, decoded.Trim());
 	}
     
-	static LevelData LoadLevelFromString(string serialized) {
-		LevelData level = new LevelData();
+	static LevelData LoadLevelFromString(LevelPack pack, string serialized) {
+		LevelData level = new LevelData(pack, "");
 		level.Deserialize(serialized);
 		Debug.Log("Deserialized level");
 		return level;
@@ -93,6 +98,33 @@ public static class LevelIO {
 		return true;
 	}
 
+	// New, working version
+	public static bool SaveLevel(LevelData level) {
+		if (!IsValidLevelName(level.Name)) {
+			Debug.LogError("Invalid level name: " + level.Name);
+			return false;
+		}
+		string path = CreateLevelPath(level);
+		Debug.Log("Saving " + level.Name + " in " + level.LevelPack.name + " to: " + path);
+		File.WriteAllText(path, "encode" + Encoding.UTF8.ToBase64(level.Serialize()), Encoding.UTF8); // Saves in Base64 (UTF-8)
+		return true;
+	}
+
+	public static LevelPack CreateLevelPack(string name) {
+		if (!IsValidLevelName(name)) {
+			Debug.LogError("Invalid level pack name: " + name);
+			return null;
+		}
+		if (!GetLevelPackExists(name)) {
+			Debug.LogError("Level pack exists: " + name);
+			return null;
+		}
+		LevelPack pack = new LevelPack(LevelDir + "/" + MD5Util.Hash(name), name, "0.0.1");
+		Directory.CreateDirectory(pack.path);
+		File.WriteAllText(pack.path + "/Pack.txt", name + "\n" + pack.version, Encoding.UTF8);
+		return pack;
+	}
+
 	// Checks whether the specied level exits
 	[Obsolete]
 	public static bool GetLevelExists(string name) {
@@ -118,6 +150,7 @@ public static class LevelIO {
 	// Gets a list of levels in either the game or the external directory
 	[Obsolete]
 	public static string[] GetLevels(bool builtin) {
+		InitIO();
 		if (builtin) {
 			Debug.LogWarning("Refusing to load resource levels, not implemented yet");
 			return new string[0];
@@ -135,6 +168,7 @@ public static class LevelIO {
 	// Lists files in the LevelPacks dir
 	[Obsolete]
 	static string[] GetFiles() {
+		InitIO();
 		List<string> files = new List<string>();
 		foreach (string path in Directory.GetFiles(LevelDir)) {
 			if (path.EndsWith(".lvl", StringComparison.Ordinal)) {
@@ -178,6 +212,7 @@ public static class LevelIO {
 		if (decoded == null) {
 			return null;
 		}
+
 		// Levels can be stored in Base64 (UTF-8), so parse them if they are
 		if (decoded.StartsWith("encode", StringComparison.OrdinalIgnoreCase)) {
 			if (!Encoding.UTF8.TryParseBase64(decoded.Substring("encode".Length), out decoded)) {
@@ -190,6 +225,7 @@ public static class LevelIO {
 
 	// Creates a list of level packs found in the LevelDir
 	public static LevelPack[] GetLevelPacks() {
+		InitIO();
 		List<LevelPack> packs = new List<LevelPack>();
 		foreach (string pack in Directory.GetDirectories(LevelDir)) {
 			if (!File.Exists(pack + "/Pack.txt")) {
@@ -205,12 +241,12 @@ public static class LevelIO {
 				Debug.LogWarning("Invalid level pack: " + pack);
 				continue;
 			}
-			LevelPack levelPack = new LevelPack(packInfo[0], packInfo[1]);  // packInfo: [NAME, VERSION_CREATED_IN]
+			LevelPack levelPack = new LevelPack(pack, packInfo[0], packInfo[1]);  // packInfo: [NAME, VERSION_CREATED_IN]
 			foreach (string level in Directory.GetFiles(pack + "/Levels/")) {
 				if (!level.EndsWith(".lvl", StringComparison.Ordinal)) {
 					continue;
 				}
-				LevelData levelData = ReadLevelFromAbsoluteLevelFile(level);
+				LevelData levelData = ReadLevelFromAbsoluteLevelFile(levelPack, level);
 				levelPack.AddLevel(levelData);
 			}
 			packs.Add(levelPack);
@@ -218,8 +254,17 @@ public static class LevelIO {
 		return packs.ToArray();
 	}
 
+	public static bool GetLevelPackExists(string name) {
+		foreach (LevelPack pack in GetLevelPacks()) {
+			if (pack.name.Equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	// Loads a level from a pure file path not relative to the LevelPacks folder
-	static LevelData ReadLevelFromAbsoluteLevelFile(string absoluteFile) {
+	static LevelData ReadLevelFromAbsoluteLevelFile(LevelPack pack, string absoluteFile) {
 		if (!File.Exists(absoluteFile)) {
 			return null;
 		}
@@ -231,7 +276,7 @@ public static class LevelIO {
 		if (string.IsNullOrEmpty(decoded)) {
 			return null;
 		}
-		return LoadLevelFromString(decoded);
+		return LoadLevelFromString(pack, decoded);
 	}
 
 	static string[] ReadPackInfoFile(string packPath) {
