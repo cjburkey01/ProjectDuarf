@@ -4784,6 +4784,7 @@ GameObject:
   - component: {fileID: 1096641917}
   - component: {fileID: 1096641916}
   - component: {fileID: 1096641915}
+  - component: {fileID: 1096641914}
   m_Layer: 5
   m_Name: GuiEditorNewPack
   m_TagString: Untagged
@@ -4813,6 +4814,28 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 300, y: 165}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1096641914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1096641912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e326ea3cd0ac74a23a911993a4defc67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultColor: {r: 0.196, g: 0.196, b: 0.196, a: 1}
+  errorColor: {r: 0.545, g: 0.062, b: 0.062, a: 1}
+  defaultString: New Level Pack
+  invalidString: Please enter a valid pack name
+  existsString: A pack with that name already exists
+  errorString: An unknown error occurred, please try again
+  levelEditorHandler: {fileID: 1566082240}
+  inputName: {fileID: 560841917}
+  error: {fileID: 1367630765}
+  buttonCreate: {fileID: 948503049}
+  buttonCancel: {fileID: 1385541210}
 --- !u!114 &1096641915
 MonoBehaviour:
   m_ObjectHideFlags: 0

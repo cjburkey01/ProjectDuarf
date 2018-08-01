@@ -62,7 +62,7 @@ public static class LevelIO {
 	static LevelData LoadLevelFromString(LevelPack pack, string serialized) {
 		LevelData level = new LevelData(pack, "");
 		level.Deserialize(serialized);
-		Debug.Log("Deserialized level");
+		//Debug.Log("Deserialized level");
 		return level;
 	}
 
@@ -105,9 +105,17 @@ public static class LevelIO {
 			return false;
 		}
 		string path = CreateLevelPath(level);
+		CheckPath(path);
 		Debug.Log("Saving " + level.Name + " in " + level.LevelPack.name + " to: " + path);
 		File.WriteAllText(path, "encode" + Encoding.UTF8.ToBase64(level.Serialize()), Encoding.UTF8); // Saves in Base64 (UTF-8)
 		return true;
+	}
+
+	static void CheckPath(string path) {
+		FileInfo file = new FileInfo(path);
+		if (!file.Directory.Exists) {
+			file.Directory.Create();
+		}
 	}
 
 	public static LevelPack CreateLevelPack(string name) {
@@ -115,7 +123,7 @@ public static class LevelIO {
 			Debug.LogError("Invalid level pack name: " + name);
 			return null;
 		}
-		if (!GetLevelPackExists(name)) {
+		if (GetLevelPackExists(name)) {
 			Debug.LogError("Level pack exists: " + name);
 			return null;
 		}
@@ -232,22 +240,22 @@ public static class LevelIO {
 				Debug.LogWarning("Level pack has no level info file: " + pack);
 				continue;
 			}
-			if (!Directory.Exists(pack + "/Levels/")) {
-				Debug.LogWarning("Level pack has no level pack folder: " + pack);
-				continue;
-			}
 			string[] packInfo = ReadPackInfoFile(pack);
 			if (packInfo == null || packInfo.Length < 2) {
 				Debug.LogWarning("Invalid level pack: " + pack);
 				continue;
 			}
 			LevelPack levelPack = new LevelPack(pack, packInfo[0], packInfo[1]);  // packInfo: [NAME, VERSION_CREATED_IN]
-			foreach (string level in Directory.GetFiles(pack + "/Levels/")) {
-				if (!level.EndsWith(".lvl", StringComparison.Ordinal)) {
-					continue;
+			if (Directory.Exists(pack + "/Levels/")) {
+				foreach (string level in Directory.GetFiles(pack + "/Levels/")) {
+					if (!level.EndsWith(".lvl", StringComparison.Ordinal)) {
+						continue;
+					}
+					LevelData levelData = ReadLevelFromAbsoluteLevelFile(levelPack, level);
+					levelPack.AddLevel(levelData);
 				}
-				LevelData levelData = ReadLevelFromAbsoluteLevelFile(levelPack, level);
-				levelPack.AddLevel(levelData);
+			} else {
+				Debug.LogWarning("Level pack has no level pack folder: " + pack);
 			}
 			packs.Add(levelPack);
 		}

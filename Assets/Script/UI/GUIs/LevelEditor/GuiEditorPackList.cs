@@ -81,7 +81,7 @@ public class GuiEditorPackList : GameGUI {
 	}
 
 	public void OnNewClick() {
-		
+		GUIHandler.ShowGui(GuiEditorNewPack.INSTANCE);
 	}
 
 	public void OnDeleteClick() {

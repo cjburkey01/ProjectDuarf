@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 
 public class GuiEditorNewPack : GameGUI {
 
@@ -17,8 +16,7 @@ public class GuiEditorNewPack : GameGUI {
 	public Text error;
 	public Button buttonCreate;
 	public Button buttonCancel;
-	
-	bool init;
+
 	bool valida;
 	bool validb;
 
@@ -27,17 +25,14 @@ public class GuiEditorNewPack : GameGUI {
 	}
 
 	public override string GetUniqueName() {
-		return "GuiEditorNewLevelPack";
+		return "GuiEditorNewPack";
 	}
 
 	public override void OnShow(GameGUI previousGui) {
-		if (!init) {
-			init = true;
-			buttonCreate.onClick.AddListener(OnCreateClick);
-			buttonCancel.onClick.AddListener(OnCancelClick);
-			error.text = defaultString;
-			error.color = defaultColor;
-		}
+		buttonCreate.onClick.AddListener(OnCreateClick);
+		buttonCancel.onClick.AddListener(OnCancelClick);
+		error.text = defaultString;
+		error.color = defaultColor;
 	}
 
 	public void OnCreateClick() {
@@ -45,15 +40,9 @@ public class GuiEditorNewPack : GameGUI {
 			return;
 		}
 		inputName.text = inputName.text.Trim();
-		if (!levelEditorHandler.NewLevel(levelPack, inputName.text)) {
-			error.text = errorString;
-		} else {
-			Debug.Log("Creating file level at: " + inputName.text);
-			GUIHandler.HideGui();
-			return;
-		}
-		error.color = errorColor;
-		Debug.LogWarning("Did not create a new level");
+		LevelIO.CreateLevelPack(inputName.text);
+		Debug.Log("Creating level pack: " + inputName.text);
+		GUIHandler.ShowGui(GuiEditorPackList.INSTANCE);
 	}
 
 	void Update() {
@@ -73,10 +62,9 @@ public class GuiEditorNewPack : GameGUI {
 	}
 
 	public void OnCancelClick() {
-		init = false;
 		buttonCreate.onClick.RemoveAllListeners();
 		buttonCancel.onClick.RemoveAllListeners();
-		GUIHandler.ShowGui(GuiEditorMenu.INSTANCE);
+		GUIHandler.ShowGui(GuiEditorPackList.INSTANCE);
 	}
 
 }

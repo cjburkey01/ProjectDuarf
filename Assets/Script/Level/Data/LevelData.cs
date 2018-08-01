@@ -133,7 +133,7 @@ public class LevelData {
 	public void Deserialize(string serialized) {
 		string[] spl = serialized.Split(new char[] { '\n', ';' }, System.StringSplitOptions.RemoveEmptyEntries);
 		bool loadingName = true;
-		Debug.Log("Loading tiles: " + (spl.Length - 1));
+		//Debug.Log("Loading tiles: " + (spl.Length - 1));
 		foreach (string tile in spl) {
 			if (loadingName) {
 				Name = tile;
@@ -147,7 +147,7 @@ public class LevelData {
 				Debug.LogError("Failed to deserialize tile: " + tile);
 			}
 		}
-		Debug.Log("Loaded " + tiles.Count + " tiles");
+		//Debug.Log("Loaded " + tiles.Count + " tiles");
 	}
 
 	public GameObject InstantiateTile(bool init, Transform parent, TileData data) {
