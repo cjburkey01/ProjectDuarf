@@ -4,7 +4,7 @@ public abstract class PowerUp : MonoBehaviour {
 
 	public TileData tile;
 	public float length = 15.0f;
-	public bool respawns = false;
+	public bool respawns;
 
 	public abstract string GetUniqueName();
 

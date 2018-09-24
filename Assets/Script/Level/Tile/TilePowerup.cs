@@ -24,12 +24,12 @@ public class TilePowerup : TilePlaceholder {
 		if (self.Data.GetHasKey("length")) {
 			powerUp.length = self.Data.GetFloat("length");
 		} else {
-			self.Data.Set("length", powerUp.length.ToString());
+			self.OnDataUpdate(GetDataWrapper("length"), powerUp.length);
 		}
 		if (self.Data.GetHasKey("respawns")) {
 			powerUp.respawns = self.Data.GetBool("respawns");
 		} else {
-			self.Data.Set("respawns", powerUp.respawns.ToString());
+			self.OnDataUpdate(GetDataWrapper("respawns"), powerUp.respawns);
 		}
 	}
 

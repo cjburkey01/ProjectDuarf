@@ -52,6 +52,15 @@ public abstract class TileInfo {
 		return tileDatas.ToArray();
 	}
 
+	public TileDataCustomizationWrapper GetDataWrapper(string name) {
+		foreach (TileDataCustomizationWrapper tile in tileDatas) {
+			if (tile.GetName().Equals(name)) {
+				return tile;
+			}
+		}
+		return null;
+	}
+
 	public virtual void OnDataUpdate(TileDataCustomizationWrapper changed, TileData self) {
 	}
 

@@ -7,16 +7,8 @@ public class LevelData {
 	public LevelPack LevelPack { private set; get; }
 	public string Name { private set; get; }
 
+	readonly List<TileData> toAdd = new List<TileData>();
 	readonly List<TileData> tiles = new List<TileData>();
-
-	//public LevelData() : this("") {
-	//}
-
-	//public LevelData(LevelPack levelPack) : this(levelPack, "") {
-	//}
-
-	//public LevelData(string name) : this(null, name) {
-	//}
 
 	public LevelData(LevelPack levelPack, string name) {
 		LevelPack = levelPack;
@@ -71,6 +63,10 @@ public class LevelData {
 	}
 
 	public void OnUpdate() {
+		foreach (TileData tile in toAdd) {
+			tile.Tile.OnAdd(tile);
+		}
+		toAdd.Clear();
 		foreach (TileData tile in tiles) {
 			tile.Tile.OnUpdate(tile);
 		}
@@ -133,7 +129,6 @@ public class LevelData {
 	public void Deserialize(string serialized) {
 		string[] spl = serialized.Split(new char[] { '\n', ';' }, System.StringSplitOptions.RemoveEmptyEntries);
 		bool loadingName = true;
-		//Debug.Log("Loading tiles: " + (spl.Length - 1));
 		foreach (string tile in spl) {
 			if (loadingName) {
 				Name = tile;
@@ -147,13 +142,13 @@ public class LevelData {
 				Debug.LogError("Failed to deserialize tile: " + tile);
 			}
 		}
-		//Debug.Log("Loaded " + tiles.Count + " tiles");
 	}
 
 	public GameObject InstantiateTile(bool init, Transform parent, TileData data) {
 		GameObject instance = null;
-		if (data.Tile.DoCustomInstantiation(init, data.Position, data.Z, data, out instance)) {
-			if (ReferenceEquals(instance, null)) {
+		bool doCustomInst = data.Tile.DoCustomInstantiation(init, data.Position, data.Z, data, out instance);
+		if (doCustomInst) {
+			if (instance == null) {
 				Debug.LogError("Unable to instantiate tile: " + data.Tile.GetResourceName() + ", the custom instantiation returned null");
 				return null;
 			}
@@ -161,7 +156,7 @@ public class LevelData {
 			data.SetInstantiated(instance);
 		} else {
 			GameObject prefab = Resources.Load<GameObject>(data.Tile.GetResourceName());
-			if (ReferenceEquals(prefab, null)) {
+			if (prefab = null) {
 				Debug.LogWarning("Unable to instantiate tile: " + data.Tile.GetResourceName() + ", the resource could not be found");
 				return null;
 			}
@@ -169,9 +164,7 @@ public class LevelData {
 			instance.name = data.Tile.GetResourceName() + " (" + data.Position.x + ", " + data.Position.y + ")";
 			data.SetInstantiated(instance);
 		}
-		if (instance != null) {
-			data.Tile.OnAdd(data);
-		}
+		toAdd.Add(data);
 		return instance;
 	}
 
