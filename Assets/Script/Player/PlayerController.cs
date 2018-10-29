@@ -67,6 +67,7 @@ public class PlayerController : MonoBehaviour {
 			}
 			foreach (MonoBehaviour mb in GetComponents<MonoBehaviour>()) {
 				try {
+					// TODO: SWITCH TO UNITY MESSAGING SYSTEM
 					if (!triggerWithLast.Contains(obj.gameObject.name) && !triggerWith.Contains(obj.gameObject.name)) {
 						MethodInfo m1 = mb.GetType().GetMethod("OnTriggeredEnter", BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof(Transform) }, null);
 						if (m1 != null) {

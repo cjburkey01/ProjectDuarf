@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using Service.Support;
+using System.Linq;
 
 public static class LevelIO {
 
@@ -68,7 +69,7 @@ public static class LevelIO {
 
 	public static bool IsValidLevelName(string name) {
 		name = name.Trim();
-		return name.Length > 3 && name.Length <= 26;
+		return name.Length > 2 && name.Length <= 26;
 	}
 
 	[Obsolete]
@@ -108,6 +109,10 @@ public static class LevelIO {
 		CheckPath(path);
 		Debug.Log("Saving " + level.Name + " in " + level.LevelPack.name + " to: " + path);
 		File.WriteAllText(path, "encode" + Encoding.UTF8.ToBase64(level.Serialize()), Encoding.UTF8); // Saves in Base64 (UTF-8)
+		if (!level.LevelPack.levelOrder.Contains(level.Name)) {
+			level.LevelPack.levelOrder.AddLast(level.Name);
+			level.LevelPack.UpdateFile();
+		}
 		return true;
 	}
 
@@ -127,9 +132,9 @@ public static class LevelIO {
 			Debug.LogError("Level pack exists: " + name);
 			return null;
 		}
-		LevelPack pack = new LevelPack(LevelDir + "/" + MD5Util.Hash(name), name, "0.0.1");
+		LevelPack pack = new LevelPack(LevelDir + "/" + MD5Util.Hash(name), name, "0.0.1", new string[0]);
 		Directory.CreateDirectory(pack.path);
-		File.WriteAllText(pack.path + "/Pack.txt", name + "\n" + pack.version, Encoding.UTF8);
+		pack.UpdateFile();
 		return pack;
 	}
 
@@ -245,7 +250,13 @@ public static class LevelIO {
 				Debug.LogWarning("Invalid level pack: " + pack);
 				continue;
 			}
-			LevelPack levelPack = new LevelPack(pack, packInfo[0], packInfo[1]);  // packInfo: [NAME, VERSION_CREATED_IN]
+			LinkedList<string> levels = new LinkedList<string>();
+			for (int i = 0; i < packInfo.Length - 2; i ++) {
+				if (packInfo[i + 2].Trim().Length > 0) {
+					levels.AddLast(packInfo[i + 2]);
+				}
+			}
+			LevelPack levelPack = new LevelPack(pack, packInfo[0], packInfo[1], levels.ToArray());  // packInfo: [NAME, VERSION_CREATED_IN], <LEVELS>
 			if (Directory.Exists(pack + "/Levels/")) {
 				foreach (string level in Directory.GetFiles(pack + "/Levels/")) {
 					if (!level.EndsWith(".lvl", StringComparison.Ordinal)) {

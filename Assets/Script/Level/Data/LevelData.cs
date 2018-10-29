@@ -156,7 +156,7 @@ public class LevelData {
 			data.SetInstantiated(instance);
 		} else {
 			GameObject prefab = Resources.Load<GameObject>(data.Tile.GetResourceName());
-			if (prefab = null) {
+			if (prefab == null) {
 				Debug.LogWarning("Unable to instantiate tile: " + data.Tile.GetResourceName() + ", the resource could not be found");
 				return null;
 			}

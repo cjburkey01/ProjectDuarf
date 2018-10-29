@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 public class LevelPack {
 
@@ -9,11 +7,27 @@ public class LevelPack {
 	public readonly string name;
 	public readonly string version;
 	readonly Dictionary<string, LevelData> levels = new Dictionary<string, LevelData>();
+	public readonly LinkedList<string> levelOrder = new LinkedList<string>();
 
-	public LevelPack(string path, string name, string version) {
+	public LevelPack(string path, string name, string version, string[] levelNames) {
 		this.path = path;
 		this.name = name;
 		this.version = version;
+		foreach (string levelName in levelNames) {
+			levelOrder.AddLast(levelName);
+		}
+	}
+
+	// TODO: FIX
+	public void UpdateFile() {
+		if (System.IO.File.Exists(path + "/Path.txt")) {
+			System.IO.File.Delete(path + "/Path.txt");
+		}
+		string data = name + "\n" + version + "\n\n";
+		foreach (string level in levelOrder) {
+			data += level + "\n";
+		}
+		System.IO.File.WriteAllText(path + "/Pack.txt", data, System.Text.Encoding.UTF8);
 	}
 
 	public void InstantiateLevel(bool init, bool fullColliders, Transform levelParent, string name) {
@@ -42,7 +56,12 @@ public class LevelPack {
 	}
 
 	public LevelData[] GetLevels() {
-		return levels.Values.ToArray();
+		LevelData[] levels = new LevelData[levelOrder.Count];
+		int i = 0;
+		foreach (string level in levelOrder) {
+			levels[i++] = GetLevel(level);
+		}
+		return levels;
 	}
 
 	public bool HasLevel(string name) {

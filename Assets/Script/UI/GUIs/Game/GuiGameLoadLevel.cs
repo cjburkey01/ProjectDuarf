@@ -49,7 +49,7 @@ public class GuiGameLoadLevel : GameGUI, ILevelSelector {
 	}
 
 	public void Replace(bool builtin) {
-		foreach (string level in LevelIO.GetLevels(builtin)) {
+		/*foreach (string level in LevelIO.GetLevels(builtin)) {
 			GameObject obj = Instantiate(levelDisplayPrefab, container.transform, false);
 			if (obj == null) {
 				continue;
@@ -64,7 +64,7 @@ public class GuiGameLoadLevel : GameGUI, ILevelSelector {
 			Select(buttonBuiltin, buttonExternal);
 		} else {
 			Select(buttonExternal, buttonBuiltin);
-		}
+		}*/
 	}
 
 	private void Select(Button sl, Button other) {
@@ -92,14 +92,14 @@ public class GuiGameLoadLevel : GameGUI, ILevelSelector {
 	}
 
 	public void OnLoadClick() {
-		if (selected == null) {
+		/*if (selected == null) {
 			return;
 		}
 		gameHandler.LoadLevel(false, selected);
 		if (!gameHandler.LevelLoaded) {
 			Clear();
 			Replace(true);
-		}
+		}*/
 	}
 
 	public void OnCancelClick() {

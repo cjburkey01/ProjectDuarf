@@ -23,7 +23,7 @@ public class GuiConfirmDelete : GameGUI {
 	}
 
 	public override void OnShow(GameGUI previousGui) {
-		if (levelName == null || !LevelIO.GetLevelExists(levelName)) {
+		/*if (levelName == null || !LevelIO.GetLevelExists(levelName)) {
 			Debug.Log("Level: " + levelName + " does not exist");
 			StartCoroutine(Remove());
 			return;
@@ -33,7 +33,7 @@ public class GuiConfirmDelete : GameGUI {
 			buttonDelete.onClick.AddListener(OnDeleteClick);
 			buttonCancel.onClick.AddListener(Close);
 			confirmation.text = string.Format(defaultText, levelName);
-		}
+		}*/
 	}
 
 	IEnumerator Remove() {
@@ -42,12 +42,12 @@ public class GuiConfirmDelete : GameGUI {
 	}
 
 	public void OnDeleteClick() {
-		if (!LevelIO.DeleteLevel(levelName)) {
+		/*if (!LevelIO.DeleteLevel(levelName)) {
 			Debug.LogError("Unable to delete level: " + levelName);
 		} else {
 			Debug.Log("Deleted level: " + levelName);
 		}
-		Close();
+		Close();*/
 	}
 
 	void Close() {
